@@ -397,7 +397,7 @@ function detectType(cards) {
     }
   }
 
-  // 同花顺（5张同花色连续，不含2/王/级牌）
+  // 同花顺（5张同花色连续，不含2/王，级牌保持原位，♥级牌=逢人配除外）
   if (n === 5 && nJ === 0) {
     const nonWild = cards.filter(c => !c.isWild);
     if (nonWild.length > 0) {
@@ -405,12 +405,8 @@ function detectType(cards) {
       const sameSuit = nonWild.every(c => c.suit === suit);
       if (sameSuit) {
         // 检查连续性（允许逢人配填补）
-        const allRanks = cards.map(c => {
-          if (c.isWild) return null;
-          return BASE_POWER[c.rank];
-        }).filter(v => v !== null && v < 15 && BASE_POWER[Object.keys(BASE_POWER).find(k => BASE_POWER[k] === v)] !== undefined);
-        // 获取非万能牌的rank值，排除2和级牌
-        const validPowers = nonWild.filter(c => c.rank !== '2' && c.rank !== TRUMP_RANK).map(c => BASE_POWER[c.rank]);
+        // 级牌保持原位参与顺子，只有♥级牌(逢人配)被排除(isWild)
+        const validPowers = nonWild.filter(c => c.rank !== '2').map(c => BASE_POWER[c.rank]);
         if (validPowers.length > 0) {
           const unique = [...new Set(validPowers)].sort((a, b) => a - b);
           const gaps = unique[unique.length - 1] - unique[0] + 1 - unique.length;
@@ -422,9 +418,11 @@ function detectType(cards) {
     }
   }
 
-  // 顺子（≥5连续单张，不含2/王/级牌，允许逢人配补断）
+  // 顺子（≥5连续单张，不含2/王，级牌保持原位可参与顺子，♥级牌=逢人配除外）
   if (n >= 5 && nJ === 0) {
-    const validCards = cards.filter(c => !c.isWild && c.rank !== '2' && c.rank !== TRUMP_RANK);
+    // 级牌保持在原来的位置参与顺子（如级牌6可以出现在3-4-5-6-7中）
+    // 但♥级牌(逢人配)必须排除，因为它是万能牌，不属于任何固定位置
+    const validCards = cards.filter(c => !c.isWild && c.rank !== '2');
     if (validCards.length > 0 || nW > 0) {
       const uniquePowers = [...new Set(validCards.map(c => BASE_POWER[c.rank]))].sort((a, b) => a - b);
       if (uniquePowers.length > 0) {
@@ -447,11 +445,11 @@ function detectType(cards) {
     }
   }
 
-  // 连对（≥3连续对，不含2/王/级牌）
+  // 连对（≥3连续对，不含2/王，级牌保持原位参与）
   if (n >= 6 && n % 2 === 0 && nJ === 0) {
     const groups = groupByRank(cards);
     const pairs = Object.entries(groups)
-      .filter(([k, v]) => v.length >= 2 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
+      .filter(([k, v]) => v.length >= 2 && BASE_POWER[k] < 15 && k !== '2')
       .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
     const np = n / 2;
     if (pairs.length >= np) {
@@ -465,11 +463,11 @@ function detectType(cards) {
     }
   }
 
-  // 钢板（≥2连续三条，不含2/王/级牌）
+  // 钢板（≥2连续三条，不含2/王，级牌保持原位参与）
   if (n >= 6 && n % 3 === 0 && nJ === 0) {
     const groups = groupByRank(cards);
     const triples = Object.entries(groups)
-      .filter(([k, v]) => v.length >= 3 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
+      .filter(([k, v]) => v.length >= 3 && BASE_POWER[k] < 15 && k !== '2')
       .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
     const nt = n / 3;
     if (triples.length >= nt) {
@@ -574,9 +572,9 @@ function decomposeHand(hand) {
     }
   }
 
-  // 3. 同花顺
+  // 3. 同花顺 — 级牌保持原位参与，只排除2和王
   const bySuit = {};
-  remaining.filter(c => !c.isWild && !c.isJoker && BASE_POWER[c.rank] < 15 && c.rank !== TRUMP_RANK)
+  remaining.filter(c => !c.isWild && !c.isJoker && BASE_POWER[c.rank] < 15 && c.rank !== '2')
     .forEach(c => { if (!bySuit[c.suit]) bySuit[c.suit] = []; bySuit[c.suit].push(c); });
 
   for (const suit in bySuit) {
@@ -596,9 +594,9 @@ function decomposeHand(hand) {
     }
   }
 
-  // 4. 顺子（≥5连续）
+  // 4. 顺子（≥5连续）— 级牌保持原位参与，只排除2和王
   for (let attempt = 0; attempt < 2; attempt++) {
-    const sc = remaining.filter(c => !c.isJoker && BASE_POWER[c.rank] < 15 && c.rank !== TRUMP_RANK);
+    const sc = remaining.filter(c => !c.isJoker && BASE_POWER[c.rank] < 15 && c.rank !== '2');
     sc.sort((a, b) => BASE_POWER[a.rank] - BASE_POWER[b.rank]);
     const unique = [...new Map(sc.map(c => [c.rank, c])).values()];
     for (let len = Math.min(unique.length, 13); len >= 5; len--) {
