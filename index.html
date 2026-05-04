@@ -1089,18 +1089,94 @@ function aiFindPlay(hand, player) {
   const lp = GAME_STATE.lastPlay;
   const candidates = [];
 
+  // EMERGENCY FIX: Also search from raw hand combinations, not just pre-decomposed groups.
+  // The decomposition might have merged cards into groups that can't match the needed type
+  // (e.g., 3 sevens decomposed as triple, but we need a pair to beat a pair).
+  // Strategy: try to construct plays directly from hand cards for common types.
+
+  // First: try decomposed groups (original logic)
   for (const g of decomp) {
     const dt = detectType(g.cards);
     if (!dt) continue;
-    // 同类型同张数
     if (dt.type === lp.type && dt.n === lp.n && dt.power > lp.power) candidates.push({ play: dt, group: g });
-    // 炸弹压非炸弹
     if (isBomb(dt.type) && !isBomb(lp.type)) candidates.push({ play: dt, group: g });
-    // 炸弹内战
     if (isBomb(dt.type) && isBomb(lp.type)) {
       if (canBeat(lp, dt)) candidates.push({ play: dt, group: g });
     }
   }
+
+  // Second: dynamic construction from hand cards for types the decomposition missed
+  const handByRank = {};
+  hand.forEach(c => {
+    const k = c.isJoker ? (c.rank === '大王' ? 'BJ' : 'SJ') : c.rank;
+    if (!handByRank[k]) handByRank[k] = [];
+    handByRank[k].push(c);
+  });
+  const rankKeys = Object.keys(handByRank).sort((a, b) => {
+    // Sort by power descending so we find the smallest beater first
+    const pa = handByRank[a][0].power, pb = handByRank[b][0].power;
+    return pa - pb; // ascending power (smallest first)
+  });
+
+  // Try to find a beater for the last play type from raw hand cards
+  if (lp.type === 'SINGLE') {
+    // Find any single card bigger than lastPlay
+    for (const k of rankKeys) {
+      const cards = handByRank[k];
+      const dt = detectType([cards[0]]);
+      if (dt && dt.power > lp.power) {
+        const alreadyFound = candidates.some(c => c.play.type === 'SINGLE' && c.play.power === dt.power);
+        if (!alreadyFound) candidates.push({ play: dt, group: { cards: [cards[0]], type: 'SINGLE' } });
+      }
+    }
+  } else if (lp.type === 'PAIR') {
+    // Find any pair bigger than lastPlay
+    for (const k of rankKeys) {
+      const cards = handByRank[k];
+      if (cards.length >= 2) {
+        const pairCards = cards.slice(0, 2);
+        const dt = detectType(pairCards);
+        if (dt && dt.type === 'PAIR' && dt.power > lp.power) {
+          const alreadyFound = candidates.some(c => c.play.type === 'PAIR' && c.play.power === dt.power);
+          if (!alreadyFound) candidates.push({ play: dt, group: { cards: pairCards, type: 'PAIR' } });
+        }
+      }
+    }
+  } else if (lp.type === 'TRIPLE') {
+    for (const k of rankKeys) {
+      const cards = handByRank[k];
+      if (cards.length >= 3) {
+        const triCards = cards.slice(0, 3);
+        const dt = detectType(triCards);
+        if (dt && dt.type === 'TRIPLE' && dt.power > lp.power) {
+          const alreadyFound = candidates.some(c => c.play.type === 'TRIPLE' && c.play.power === dt.power);
+          if (!alreadyFound) candidates.push({ play: dt, group: { cards: triCards, type: 'TRIPLE' } });
+        }
+      }
+    }
+  } else if (lp.type === 'TRI_PAIR') {
+    // Find 3+2 combo bigger than lastPlay
+    for (const k of rankKeys) {
+      const cards = handByRank[k];
+      if (cards.length >= 3) {
+        // Find a pair from other ranks
+        for (const k2 of rankKeys) {
+          if (k2 === k) continue;
+          const pairCards = handByRank[k2];
+          if (pairCards.length >= 2) {
+            const combo = [...cards.slice(0, 3), ...pairCards.slice(0, 2)];
+            const dt = detectType(combo);
+            if (dt && dt.type === 'TRI_PAIR' && dt.power > lp.power) {
+              const alreadyFound = candidates.some(c => c.play.type === 'TRI_PAIR' && c.play.power === dt.power);
+              if (!alreadyFound) candidates.push({ play: dt, group: { cards: combo, type: 'TRI_PAIR' } });
+              break; // One pair per triple is enough
+            }
+          }
+        }
+      }
+    }
+  }
+  // BOMB and FLUSH are already handled by decomposed groups (they need specific compositions)
 
   // IMPROVED sort: prefer non-wild plays first, then by power (cheapest first)
   // This ensures AI uses natural plays before consuming wild cards
@@ -1111,56 +1187,75 @@ function aiFindPlay(hand, player) {
     return a.play.power - b.play.power;
   });
 
-  // 下家(Blocker): 紧盯对手，积极压牌
-  // IMPROVED: Check BOTH opponents' card counts (P0 & P2), use bombs when either is close
+// 下家(Blocker): 紧盯对手，积极压牌——绝不轻易放过
   if (player === 1) {
     const minOppCards = Math.min(GAME_STATE.hands[0].length, GAME_STATE.hands[2].length);
 
     for (const c of candidates) {
       if (isBomb(c.play.type)) {
-        // IMPROVED bomb timing: use bombs when opponent is close OR self is in endgame
-        if (minOppCards <= 3) return buildPlay(c.group);  // opponent critical
-        if (minOppCards <= 5) return buildPlay(c.group);  // opponent close
-        if (handCount <= 5) return buildPlay(c.group);    // self endgame
-        continue; // save bombs for later
+        if (minOppCards <= 3) return buildPlay(c.group);
+        if (minOppCards <= 5) return buildPlay(c.group);
+        if (handCount <= 5) return buildPlay(c.group);
+        continue;
       }
-      // Non-bomb: always beat (the sorted candidates already prefer non-wild)
       return buildPlay(c.group);
+    }
+    // FIX: No candidate found but we MUST try to play something, not just pass
+    // Play the smallest card from hand as a desperate move
+    const sorted = [...hand].sort((a, b) => a.power - b.power);
+    const nonWild = sorted.filter(c => !c.isWild);
+    const pick = nonWild.length > 0 ? nonWild[0] : sorted[0];
+    if (pick) {
+      const dt = detectType([pick]);
+      if (dt && canBeat(lp, dt)) return { cards: [pick], type: dt.type, power: dt.power, n: 1 };
     }
     return null;
   }
 
-  // 对家(Supporter): 保存实力，绝不压搭档（此分支只走到对手牌）
-  // IMPROVED: Save bombs for critical moments, save wilds when possible
+  // 对家(Supporter): 配合搭档，关键时刻压牌
   if (player === 2) {
     const minOppCards = Math.min(GAME_STATE.hands[1].length, GAME_STATE.hands[3].length);
 
     for (const c of candidates) {
       if (isBomb(c.play.type)) {
-        // Only use bombs when opponents are dangerously close or self is endgame
         if (minOppCards <= 3) return buildPlay(c.group);
         if (handCount <= 4) return buildPlay(c.group);
         continue;
       }
-      // Non-bomb: use if non-wild, OR if opponents are critical (≤3 cards)
       if (!groupUsesWild(c.group) || minOppCards <= 3) return buildPlay(c.group);
-      // IMPROVED: Skip wild-using plays when not critical - save 逢人配
     }
-    return null; // 让牌
+    // FIX: If opponents are close to winning, supporter should also try to beat
+    if (minOppCards <= 5) {
+      const sorted = [...hand].sort((a, b) => a.power - b.power);
+      const nonWild = sorted.filter(c => !c.isWild);
+      const pick = nonWild.length > 0 ? nonWild[0] : sorted[0];
+      if (pick) {
+        const dt = detectType([pick]);
+        if (dt && canBeat(lp, dt)) return { cards: [pick], type: dt.type, power: dt.power, n: 1 };
+      }
+    }
+    return null;
   }
 
-  // 上家(Opportunist): 选择性压
-  // IMPROVED: Check both opponents' card counts, smarter bomb usage
+  // 上家(Opportunist): 选择性压，一定要用力
   if (player === 3) {
     const minOppCards = Math.min(GAME_STATE.hands[0].length, GAME_STATE.hands[2].length);
 
     for (const c of candidates) {
       if (isBomb(c.play.type)) {
-        if (minOppCards <= 3) return buildPlay(c.group);  // opponent critical
-        if (handCount <= 6) return buildPlay(c.group);    // self endgame
+        if (minOppCards <= 3) return buildPlay(c.group);
+        if (handCount <= 6) return buildPlay(c.group);
         continue;
       }
       return buildPlay(c.group);
+    }
+    // FIX: Opportunist should also try smallest card if no candidates
+    const sorted = [...hand].sort((a, b) => a.power - b.power);
+    const nonWild = sorted.filter(c => !c.isWild);
+    const pick = nonWild.length > 0 ? nonWild[0] : sorted[0];
+    if (pick) {
+      const dt = detectType([pick]);
+      if (dt && canBeat(lp, dt)) return { cards: [pick], type: dt.type, power: dt.power, n: 1 };
     }
   }
 
