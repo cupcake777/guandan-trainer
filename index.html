@@ -898,6 +898,17 @@ function doPass() {
   setTimeout(() => aiTurn(1), 800);
 }
 
+// Convert a decomposition group into a play object for AI use
+function buildPlay(group) {
+  const dt = detectType(group.cards);
+  if (!dt) {
+    // Fallback: single card
+    const c = group.cards[0] || group[0];
+    return { cards: [c], type: 'SINGLE', power: c.power, n: 1 };
+  }
+  return { cards: group.cards, type: dt.type, power: dt.power, n: dt.n, level: dt.level };
+}
+
 // ==================== AI BEHAVIOR TREES ====================
 // ==================== AI BEHAVIOR TREES (IMPROVED) ====================
 // Improvements over original:
