@@ -218,6 +218,8 @@ const SUITS = ['♥','♦','♣','♠'];
 const RANKS = ['3','4','5','6','7','8','9','10','J','Q','K','A','2'];
 const JOKER_NAMES = ['小王','大王'];
 const BASE_POWER = {'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14,'2':15,'小王':16,'大王':17};
+// 连续性位置值：2在原位(2)，用于连对/钢板的连续性判断
+const SEQ_POS = {'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14,'2':2};
 
 // 动态级牌
 let TRUMP_RANK = '2';
@@ -445,37 +447,38 @@ function detectType(cards) {
     }
   }
 
-  // 连对（≥3连续对，不含2/王，级牌保持原位参与）
+  // 连对（≥3连续对，不含王；2和级牌都可以参与）
   if (n >= 6 && n % 2 === 0 && nJ === 0) {
     const groups = groupByRank(cards);
     const pairs = Object.entries(groups)
-      .filter(([k, v]) => v.length >= 2 && BASE_POWER[k] < 15 && k !== '2')
-      .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+      .filter(([k, v]) => v.length >= 2 && k !== 'WILD' && !k.startsWith('JK_'))
+      .sort((a, b) => SEQ_POS[a[0]] - SEQ_POS[b[0]]);
     const np = n / 2;
     if (pairs.length >= np) {
-      const ranks = pairs.map(([k]) => BASE_POWER[k]);
+      const ranks = pairs.map(([k]) => SEQ_POS[k]);
       for (let i = 0; i <= pairs.length - np; i++) {
         const seq = ranks.slice(i, i + np);
         if (seq[seq.length - 1] - seq[0] === np - 1) {
-          return { type: 'PAIR_SEQ', power: seq[seq.length - 1], n, pairCount: np };
+          // power for comparison uses BASE_POWER (2=15, biggest in game)
+          return { type: 'PAIR_SEQ', power: BASE_POWER[pairs[i + np - 1][0]], n, pairCount: np };
         }
       }
     }
   }
 
-  // 钢板（≥2连续三条，不含2/王，级牌保持原位参与）
+  // 钢板（≥2连续三条，不含王；2和级牌都可以参与）
   if (n >= 6 && n % 3 === 0 && nJ === 0) {
     const groups = groupByRank(cards);
     const triples = Object.entries(groups)
-      .filter(([k, v]) => v.length >= 3 && BASE_POWER[k] < 15 && k !== '2')
-      .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+      .filter(([k, v]) => v.length >= 3 && k !== 'WILD' && !k.startsWith('JK_'))
+      .sort((a, b) => SEQ_POS[a[0]] - SEQ_POS[b[0]]);
     const nt = n / 3;
     if (triples.length >= nt) {
-      const ranks = triples.map(([k]) => BASE_POWER[k]);
+      const ranks = triples.map(([k]) => SEQ_POS[k]);
       for (let i = 0; i <= triples.length - nt; i++) {
         const seq = ranks.slice(i, i + nt);
         if (seq[seq.length - 1] - seq[0] === nt - 1) {
-          return { type: 'PLATE', power: seq[seq.length - 1], n, tripleCount: nt };
+          return { type: 'PLATE', power: BASE_POWER[triples[i + nt - 1][0]], n, tripleCount: nt };
         }
       }
     }
@@ -613,13 +616,13 @@ function decomposeHand(hand) {
     }
   }
 
-  // 5. 连对（≥3连续对）
+  // 5. 连对（≥3连续对，2和级牌都可以参与）
   const pairGroups = groupByRankSimple(remaining);
   const pairs = Object.entries(pairGroups)
-    .filter(([k, v]) => v.length >= 2 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
-    .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+    .filter(([k, v]) => v.length >= 2 && k !== 'WILD' && !k.startsWith('JK_'))
+    .sort((a, b) => SEQ_POS[a[0]] - SEQ_POS[b[0]]);
   if (pairs.length >= 3) {
-    const ranks = pairs.map(([k]) => BASE_POWER[k]);
+    const ranks = pairs.map(([k]) => SEQ_POS[k]);
     for (let len = Math.min(pairs.length, 10); len >= 3; len--) {
       for (let i = 0; i <= pairs.length - len; i++) {
         const seq = ranks.slice(i, i + len);
@@ -634,13 +637,13 @@ function decomposeHand(hand) {
     }
   }
 
-  // 6. 钢板（≥2连续三条）
+  // 6. 钢板（≥2连续三条，2和级牌都可以参与）
   const tripGroups = groupByRankSimple(remaining);
   const triples = Object.entries(tripGroups)
-    .filter(([k, v]) => v.length >= 3 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
-    .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+    .filter(([k, v]) => v.length >= 3 && k !== 'WILD' && !k.startsWith('JK_'))
+    .sort((a, b) => SEQ_POS[a[0]] - SEQ_POS[b[0]]);
   if (triples.length >= 2) {
-    const ranks = triples.map(([k]) => BASE_POWER[k]);
+    const ranks = triples.map(([k]) => SEQ_POS[k]);
     for (let len = Math.min(triples.length, 4); len >= 2; len--) {
       for (let i = 0; i <= triples.length - len; i++) {
         const seq = ranks.slice(i, i + len);
