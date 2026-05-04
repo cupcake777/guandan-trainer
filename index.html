@@ -217,8 +217,9 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
 const SUITS = ['♥','♦','♣','♠'];
 const RANKS = ['3','4','5','6','7','8','9','10','J','Q','K','A','2'];
 const JOKER_NAMES = ['小王','大王'];
-const BASE_POWER = {'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14,'2':15,'小王':16,'大王':17};
-// 连续性位置值：2在原位(2)，用于连对/钢板的连续性判断
+// 原始牌力：2=2（不是15！），级牌在getPower动态提升
+const BASE_POWER = {'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14,'2':2,'小王':16,'大王':17};
+// 连续性位置值：2在原位(2)，用于连对/钢板的连续性判断（2=3-4+..., A=14, 2不参与顺子）
 const SEQ_POS = {'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14,'2':2};
 
 // 动态级牌
@@ -226,16 +227,16 @@ let TRUMP_RANK = '2';
 let WILD_SUIT = '♥';
 
 // 获取牌力（含级牌加成）
-// 排序: 3<4<...<K<A<级牌<2<小王<大王
-// 级牌≠2时：非万能力14.5，万能力14.7
-// 级牌=2时：2保持15，逢人配♥2也15
+// 正确排序: 3<4<...<K<A<级牌(比A大)<2(级牌时)或<级牌<小王<大王
+// 非级牌的2就是普通牌(值=2)，级牌提升到比A大(14.5/14.7)
+// 打2时：2是级牌→值15，♥2(逢人配)也15
 function getPower(card) {
   if (card.isJoker) return BASE_POWER[card.rank]; // 小王16, 大王17
   if (card.rank === TRUMP_RANK) {
-    if (TRUMP_RANK === '2') return 15; // 打2时，2和♥2都15
-    return card.isWild ? 14.7 : 14.5;  // 万能14.7，普通级牌14.5
+    if (TRUMP_RANK === '2') return 15; // 打2时，2是级牌=最大普通牌
+    return card.isWild ? 14.7 : 14.5;  // 万能15.4，普通级牌14.5(比A=14大)
   }
-  return BASE_POWER[card.rank];
+  return BASE_POWER[card.rank]; // 非级牌的2=2，A=14，K=13...
 }
 
 // 获取牌组的key power（用于牌型比较）
@@ -408,11 +409,12 @@ function detectType(cards) {
       if (sameSuit) {
         // 检查连续性（允许逢人配填补）
         // 级牌保持原位参与顺子，只有♥级牌(逢人配)被排除(isWild)
-        const validPowers = nonWild.filter(c => c.rank !== '2').map(c => BASE_POWER[c.rank]);
+        // 顺子/同花顺不含2和王（2不参与顺子）
+        const validPowers = nonWild.filter(c => c.rank !== '2' && !c.isJoker).map(c => BASE_POWER[c.rank]);
         if (validPowers.length > 0) {
           const unique = [...new Set(validPowers)].sort((a, b) => a - b);
           const gaps = unique[unique.length - 1] - unique[0] + 1 - unique.length;
-          if (gaps <= nW && unique.length + nW === 5 && unique[unique.length - 1] < 15) {
+          if (gaps <= nW && unique.length + nW === 5) {
             return { type: 'FLUSH', power: unique[unique.length - 1], n: 5, level: 5.5, suit };
           }
         }
@@ -424,12 +426,11 @@ function detectType(cards) {
   if (n >= 5 && nJ === 0) {
     // 级牌保持在原来的位置参与顺子（如级牌6可以出现在3-4-5-6-7中）
     // 但♥级牌(逢人配)必须排除，因为它是万能牌，不属于任何固定位置
-    const validCards = cards.filter(c => !c.isWild && c.rank !== '2');
+    const validCards = cards.filter(c => !c.isWild && c.rank !== '2' && !c.isJoker);
     if (validCards.length > 0 || nW > 0) {
       const uniquePowers = [...new Set(validCards.map(c => BASE_POWER[c.rank]))].sort((a, b) => a - b);
       if (uniquePowers.length > 0) {
-        // 非万能牌最大值 < 15（不含2）
-        if (uniquePowers[uniquePowers.length - 1] < 15) {
+        // 顺子不含2和王
           const gaps = uniquePowers[uniquePowers.length - 1] - uniquePowers[0] + 1 - uniquePowers.length;
           if (gaps <= nW) {
             // 可以用逢人配填补
@@ -459,8 +460,8 @@ function detectType(cards) {
       for (let i = 0; i <= pairs.length - np; i++) {
         const seq = ranks.slice(i, i + np);
         if (seq[seq.length - 1] - seq[0] === np - 1) {
-          // power for comparison uses BASE_POWER (2=15, biggest in game)
-          return { type: 'PAIR_SEQ', power: BASE_POWER[pairs[i + np - 1][0]], n, pairCount: np };
+          // 连对/钢板的power需反映级牌提升后的真实牌力
+          return { type: 'PAIR_SEQ', power: getPower({rank:pairs[i + np - 1][0],suit:'♣',isJoker:false,isWild:false}), n, pairCount: np };
         }
       }
     }
@@ -478,7 +479,7 @@ function detectType(cards) {
       for (let i = 0; i <= triples.length - nt; i++) {
         const seq = ranks.slice(i, i + nt);
         if (seq[seq.length - 1] - seq[0] === nt - 1) {
-          return { type: 'PLATE', power: BASE_POWER[triples[i + nt - 1][0]], n, tripleCount: nt };
+          return { type: 'PLATE', power: getPower({rank:triples[i + nt - 1][0],suit:'♣',isJoker:false,isWild:false}), n, tripleCount: nt };
         }
       }
     }
@@ -486,15 +487,16 @@ function detectType(cards) {
 
   // 飞机（钢板+等量对子翅膀）
   if (n >= 10 && n % 5 === 0 && nJ === 0) {
-    const groups = groupByRank(cards);
+    const groups = groupByRankSimple(cards);
     const triples = Object.entries(groups)
-      .filter(([k, v]) => v.length >= 3 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
-      .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+      // 钢板：连续三同张，级牌保持原位参与，排除2和王和♥级牌(万能牌)
+      .filter(([k, v]) => v.length >= 3 && k !== '2' && k !== '小王' && k !== '大王' && k !== 'WILD')
+      .sort((a, b) => SEQ_POS[a[0]] - SEQ_POS[b[0]]);
     const nt = n / 5;
     for (let len = triples.length; len >= nt; len--) {
       for (let i = 0; i <= triples.length - len; i++) {
         const seq = triples.slice(i, i + len);
-        const ranks = seq.map(([k]) => BASE_POWER[k]);
+        const ranks = seq.map(([k]) => SEQ_POS[k]);
         if (ranks[ranks.length - 1] - ranks[0] === len - 1) {
           const usedIds = new Set(seq.flatMap(([_, v]) => v.slice(0, 3)).map(c => c.id));
           const remaining = cards.filter(c => !usedIds.has(c.id));
@@ -577,7 +579,8 @@ function decomposeHand(hand) {
 
   // 3. 同花顺 — 级牌保持原位参与，只排除2和王
   const bySuit = {};
-  remaining.filter(c => !c.isWild && !c.isJoker && BASE_POWER[c.rank] < 15 && c.rank !== '2')
+  // 同花顺不含2和王（2不参与顺子）
+  remaining.filter(c => !c.isWild && !c.isJoker && c.rank !== '2')
     .forEach(c => { if (!bySuit[c.suit]) bySuit[c.suit] = []; bySuit[c.suit].push(c); });
 
   for (const suit in bySuit) {
@@ -599,7 +602,8 @@ function decomposeHand(hand) {
 
   // 4. 顺子（≥5连续）— 级牌保持原位参与，只排除2和王
   for (let attempt = 0; attempt < 2; attempt++) {
-    const sc = remaining.filter(c => !c.isJoker && BASE_POWER[c.rank] < 15 && c.rank !== '2');
+    // 顺子不含2、王、♥级牌（万能牌），级牌保持原位参与
+    const sc = remaining.filter(c => !c.isJoker && !c.isWild && c.rank !== '2');
     sc.sort((a, b) => BASE_POWER[a.rank] - BASE_POWER[b.rank]);
     const unique = [...new Map(sc.map(c => [c.rank, c])).values()];
     for (let len = Math.min(unique.length, 13); len >= 5; len--) {
