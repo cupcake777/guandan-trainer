@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>掼蛋特训营 v4</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#e6edf3;--dim:#8b949e;--accent:#f0883e;--green:#238636;--red:#da3633;--blue:#1f6feb;--gold:#d4a017}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;-webkit-user-select:none;user-select:none}
+.app{max-width:480px;margin:0 auto;padding:6px 8px}
+.hdr{text-align:center;padding:4px 0;font-size:13px;color:var(--dim)}
+.hdr .tr{color:var(--accent);font-weight:bold;font-size:15px}
+.tabs{display:flex;gap:3px;margin:4px 0;background:var(--card);border-radius:8px;padding:3px}
+.tab{flex:1;text-align:center;padding:7px 2px;font-size:11px;font-weight:bold;border-radius:6px;cursor:pointer;color:var(--dim);transition:all .2s}
+.tab.on{background:var(--accent);color:#fff}
+.pbar{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:var(--card);border-radius:8px;margin:4px 0;font-size:12px}
+.pbar .sc{color:var(--accent);font-weight:bold}
+.card-row{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;padding:6px;background:var(--card);border-radius:8px;margin:4px 0;min-height:50px}
+.cd{width:42px;height:60px;background:linear-gradient(145deg,#fff,#f5f5f0);color:#1a1a2e;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;border:2px solid transparent;transition:all .12s;flex-shrink:0;line-height:1.1}
+.cd .r{font-size:12px}.cd .s{font-size:10px}
+.cd.red{color:#c0392b}.cd.blk{color:#2c3e50}
+.cd.wild{border-color:var(--gold);background:linear-gradient(145deg,#fff9e6,#fff3cd)}
+.cd.jk-s{background:linear-gradient(145deg,#1a1a2e,#16213e);color:#00b4d8;border-color:#00b4d8}
+.cd.jk-b{background:linear-gradient(145deg,#1a1a2e,#0f3460);color:#e94560;border-color:#e94560}
+.cd.sel{transform:translateY(-10px);border-color:#58a6ff;box-shadow:0 3px 8px rgba(88,166,255,.4)}
+.cd.sm{width:34px;height:48px;font-size:9px}.cd.sm .r{font-size:10px}.cd.sm .s{font-size:8px}
+.cd.dis{opacity:.5;pointer-events:none}
+.btn{padding:9px 16px;border:none;border-radius:6px;font-size:14px;font-weight:bold;cursor:pointer;margin:3px}
+.btn-g{background:var(--green);color:#fff}.btn-r{background:var(--red);color:#fff}
+.btn-b{background:var(--blue);color:#fff}.btn-o{background:var(--accent);color:#fff}
+.btn-d{background:var(--border);color:var(--dim);pointer-events:none}
+.brow{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:4px 0}
+.pn{background:var(--card);border-radius:8px;padding:10px;margin:4px 0}
+.pn h3{color:var(--accent);font-size:14px;margin-bottom:4px}
+.pn p,.pn li{font-size:13px;line-height:1.5;color:var(--text)}.pn ul{padding-left:18px}
+.opt{display:block;background:var(--card);padding:10px 12px;margin:5px 0;border-radius:8px;cursor:pointer;border:2px solid var(--border);font-size:13px;line-height:1.5;transition:all .15s}
+.opt:hover{border-color:var(--accent)}
+.opt.ok{border-color:var(--green);background:#1a3a2a}.opt.no{border-color:var(--red);background:#3a1a1a}
+.opt.dis{pointer-events:none;opacity:.7}
+.fb{padding:8px 10px;border-radius:6px;margin:6px 0;font-size:13px;line-height:1.5;display:none}
+.fb.ok{display:block;background:#1a3a2a;border:1px solid var(--green)}.fb.no{display:block;background:#3a1a1a;border:1px solid var(--red)}
+.mp{display:none}.mp.on{display:block}
+.pinfo{display:flex;justify-content:space-between;padding:5px 8px;background:var(--card);border-radius:6px;margin:3px 0;font-size:12px;align-items:center}
+.pinfo .nm{font-weight:bold}.pinfo .ct{color:var(--dim)}
+.pinfo.on{border:1px solid var(--accent)}
+.pinfo .tm{font-size:10px;padding:1px 5px;border-radius:3px;color:#fff}
+.tm-a{background:var(--green)}.tm-b{background:var(--red)}
+.last-area{background:var(--card);border-radius:8px;padding:8px;margin:4px 0;min-height:60px}
+.last-area .lb{text-align:center;color:var(--dim);font-size:11px;margin-bottom:4px}
+.last-area .cards{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.st{text-align:center;padding:4px;font-size:14px;color:var(--accent);min-height:20px}
+.decomp{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px;margin:4px 0;font-size:11px}
+.decomp .g{display:inline-block;background:#21262d;padding:2px 5px;border-radius:3px;margin:2px}
+.decomp .g .hl{color:var(--accent)}
+.group-area{background:var(--card);border-radius:8px;padding:8px;margin:4px 0}
+.group-area .lbl{font-size:11px;color:var(--dim);margin-bottom:4px}
+.group-row{display:flex;gap:3px;flex-wrap:wrap;min-height:45px;padding:4px;background:var(--bg);border-radius:6px;margin:3px 0}
+.group-row .grp{display:inline-flex;gap:2px;background:#21262d;padding:3px;border-radius:4px;cursor:pointer}
+.group-row .grp:hover{background:#30363d}
+.score-box{text-align:center;padding:8px;background:var(--card);border-radius:8px;margin:4px 0}
+.score-box .grade{font-size:24px;font-weight:bold;color:var(--accent)}
+.score-box .detail{font-size:12px;color:var(--dim);margin-top:4px}
+.review{background:#1a1a2e;border:1px solid var(--blue);border-radius:8px;padding:10px;margin:6px 0;font-size:12px}
+.review .warn{color:var(--red);font-weight:bold}.review .good{color:var(--green);font-weight:bold}
+.trib-player{background:var(--card);border-radius:8px;padding:6px;flex:1;min-width:100px;font-size:11px;border:1px solid var(--border)}
+.trib-player .tp-name{font-weight:bold;font-size:12px;color:var(--accent)}
+.trib-player .tp-rank{font-size:10px;color:var(--dim)}
+.trib-player .tp-cards{display:flex;flex-wrap:wrap;gap:1px;margin-top:3px}
+.trib-player .tp-cards .cd{width:24px;height:34px;font-size:7px}.trib-player .tp-cards .cd .r{font-size:8px}.trib-player .tp-cards .cd .s{font-size:7px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">🃏 掼蛋特训营 v4 &nbsp;<span class="tr" id="trumpD">打 2 · ♥2 逢人配</span></div>
+
+<div class="tabs">
+<div class="tab on" onclick="go('game')">🃏 对局</div>
+<div class="tab" onclick="go('pattern')">🧩 牌型</div>
+<div class="tab" onclick="go('compare')">⚖️ 大小</div>
+<div class="tab" onclick="go('decision')">🧠 决策</div>
+<div class="tab" onclick="go('sorting')">🎯 理牌</div>
+<div class="tab" onclick="go('tribute')">🎁 进贡</div>
+</div>
+
+<div class="pbar">
+<span>✅<span class="sc" id="sOk">0</span></span>
+<span>❌<span class="sc" id="sNo">0</span></span>
+<span>📊<span class="sc" id="sRt">0%</span></span>
+</div>
+
+<!-- GAME MODE -->
+<div class="mp on" id="mp-game">
+<div class="pinfo" id="pi3"><span>☝️ 上家 <span class="tm tm-b">敌</span></span><span class="ct" id="pc3">27 张</span></div>
+<div class="pinfo" id="pi2"><span>👋 对家 <span class="tm tm-a">友</span></span><span class="ct" id="pc2">27 张</span></div>
+<div class="pinfo" id="pi1"><span>👇 下家 <span class="tm tm-b">敌</span></span><span class="ct" id="pc1">27 张</span></div>
+<div class="last-area"><div class="lb" id="laLbl">等待开局</div><div class="cards" id="laCards"></div></div>
+<div class="st" id="gStat">点击发牌开始</div>
+<div class="brow" id="gBtns" style="display:none">
+<button class="btn btn-r" id="bPass" onclick="doPass()">过</button>
+<button class="btn btn-g" id="bPlay" onclick="doPlay()">出牌</button>
+<button class="btn btn-b" onclick="showDecomp()">💡理牌</button>
+</div>
+<div class="brow"><button class="btn btn-o" onclick="startNewGame()">🎲 发牌</button><button class="btn btn-b" onclick="go('rules')">📖规则</button></div>
+<div style="font-size:12px;color:var(--dim);padding:2px" id="gInfo"></div>
+<div class="card-row" id="gHand"></div>
+<div class="decomp" id="gDecomp" style="display:none"></div>
+<div class="review" id="gReview" style="display:none"></div>
+</div>
+
+<!-- PATTERN MODE -->
+<div class="mp" id="mp-pattern">
+<div class="pn"><h3>🧩 牌型识别</h3><p>下面的牌可以组成什么牌型？选出所有正确的。</p></div>
+<div class="card-row" id="patC"></div>
+<div id="patO"></div>
+<div id="patFb" class="fb"></div>
+<div class="brow"><button class="btn btn-g" id="patChk" onclick="patCheck()">确认</button><button class="btn btn-o" onclick="patNew()">下一题➡️</button></div>
+</div>
+
+<!-- COMPARE MODE -->
+<div class="mp" id="mp-compare">
+<div class="pn"><h3>⚖️ 大小比较</h3><p>哪组牌更大？</p></div>
+<div style="display:flex;gap:4px">
+<div style="flex:1"><div class="hdr" style="font-size:12px">A</div><div class="card-row" id="cmpA"></div></div>
+<div style="flex:1"><div class="hdr" style="font-size:12px">B</div><div class="card-row" id="cmpB"></div></div>
+</div>
+<div id="cmpO"></div>
+<div id="cmpFb" class="fb"></div>
+<div class="brow"><button class="btn btn-o" onclick="cmpNew()">下一题➡️</button></div>
+</div>
+
+<!-- DECISION MODE -->
+<div class="mp" id="mp-decision">
+<div class="pn"><h3>🧠 出牌决策</h3><p id="decS"></p></div>
+<div class="hdr" style="font-size:12px">你的手牌</div>
+<div class="card-row" id="decH"></div>
+<div class="hdr" style="font-size:12px" id="decL">场上出的牌</div>
+<div class="card-row" id="decP"></div>
+<div id="decO"></div>
+<div id="decFb" class="fb"></div>
+<div class="brow"><button class="btn btn-o" onclick="decNew()">下一题➡️</button></div>
+</div>
+
+<!-- SORTING MODE -->
+<div class="mp" id="mp-sorting">
+<div class="pn"><h3>🎯 理牌训练</h3><p>将 27 张牌分组，目标是手数最少。提交后系统评分。</p></div>
+<div class="hdr" id="sortInfo"></div>
+<div class="card-row" id="sortHand"></div>
+<div class="group-area">
+<div class="lbl">已创建的牌组（点击可删除）</div>
+<div class="group-row" id="sortGroups"></div>
+</div>
+<div class="brow">
+<button class="btn btn-b" onclick="addSelectedGroup()">➕ 将选中牌成组</button>
+<button class="btn btn-r" onclick="clearGroups()">🗑️ 清空所有组</button>
+</div>
+<div class="brow"><button class="btn btn-g" onclick="sortSubmit()">✅ 提交评分</button><button class="btn btn-o" onclick="sortNew()">🔄 新手牌</button></div>
+<div id="sortFb" class="fb"></div>
+<div class="score-box" id="sortScore" style="display:none">
+<div class="grade" id="sortGrade"></div>
+<div class="detail" id="sortDetail"></div>
+</div>
+</div>
+
+<!-- TRIBUTE MODE -->
+<div class="mp" id="mp-tribute">
+<div class="pn"><h3>🎁 进贡训练</h3><p>根据上一局成绩和手牌，判断谁进贡、进哪张、谁还贡、还哪张、谁先出牌。</p></div>
+<div id="tribDesc" style="background:var(--card);border-radius:8px;padding:8px;margin:4px 0;font-size:13px"></div>
+<div id="tribPlayers" style="display:flex;flex-wrap:wrap;gap:4px;margin:4px 0"></div>
+<div class="hdr" style="font-size:12px">手牌详情</div>
+<div class="card-row" id="tribCards"></div>
+<div id="tribO"></div>
+<div id="tribFb" class="fb"></div>
+<div class="brow"><button class="btn btn-o" onclick="tribNew()">下一题➡️</button></div>
+<div class="pbar">
+<span>✅<span class="sc" id="tribOk">0</span></span>
+<span>❌<span class="sc" id="tribNo">0</span></span>
+<span>🔥<span class="sc" id="tribStreak">0</span></span>
+</div>
+</div>
+
+<!-- RULES -->
+<div class="mp" id="mp-rules">
+<div class="pn">
+<h3>📖 掼蛋规则速查</h3>
+<p><b>牌型：</b></p>
+<ul>
+<li>单张、对子、三条、三带对 (三同 + 一对，5 张)</li>
+<li>顺子 (≥5 连单，不含 2/王/级牌)</li>
+<li>连对 (≥3 连对，不含 2/王/级牌)</li>
+<li>钢板 (≥2 连三条，不含 2/王/级牌)</li>
+<li>飞机 (钢板 + 等量对子翅膀)</li>
+<li>炸弹 (≥4 同张)、同花顺 (5 同花色连续)、四王 (2小+2大，最大)</li>
+</ul>
+<p><b>大小：</b></p>
+<ul>
+<li>3&lt;4&lt;...&lt;K&lt;A&lt;级牌&lt;2&lt;小王&lt;大王</li>
+<li>同类型同张数才能比较</li>
+<li>炸弹&gt;非炸弹，张数多&gt;少，同张数比点数</li>
+<li>4炸(L4)&lt;5炸(L5)&lt;同花顺(L5.5)&lt;6炸(L6)&lt;7炸(L7)&lt;8炸(L8)&lt;四王(L99)</li>
+</ul>
+<p><b>核心策略：</b></p>
+<ul>
+<li><b>RBAC 权限：</b>好牌≤6手=Admin冲头游，烂牌≥9手=Guest做辅助</li>
+<li><b>定向路由：</b>拦截下家，喂牌对家，对家出牌绝不压</li>
+<li><b>压缩算法：</b>贪心最长阵列优先（顺/连对/钢板），三条必须带对，逢人配补断裂</li>
+<li><b>残局重构：</b>剩炸弹+1单→果断炸了出单清空</li>
+</ul>
+</div>
+<div class="brow"><button class="btn btn-o" onclick="go('game')">← 返回对局</button></div>
+</div>
+</div>
+
+<script>
+// ==================== MODULE 1: ENVIRONMENT & DATA LAYER ====================
+// 常量
+const SUITS = ['♥','♦','♣','♠'];
+const RANKS = ['3','4','5','6','7','8','9','10','J','Q','K','A','2'];
+const JOKER_NAMES = ['小王','大王'];
+const BASE_POWER = {'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14,'2':15,'小王':16,'大王':17};
+
+// 动态级牌
+let TRUMP_RANK = '2';
+let WILD_SUIT = '♥';
+
+// 获取牌力（含级牌加成）
+// 排序: 3<4<...<K<A<级牌<2<小王<大王
+// 级牌≠2时：非万能力14.5，万能力14.7
+// 级牌=2时：2保持15，逢人配♥2也15
+function getPower(card) {
+  if (card.isJoker) return BASE_POWER[card.rank]; // 小王16, 大王17
+  if (card.rank === TRUMP_RANK) {
+    if (TRUMP_RANK === '2') return 15; // 打2时，2和♥2都15
+    return card.isWild ? 14.7 : 14.5;  // 万能14.7，普通级牌14.5
+  }
+  return BASE_POWER[card.rank];
+}
+
+// 获取牌组的key power（用于牌型比较）
+function getKeyPower(cards) {
+  const nonWild = cards.filter(c => !c.isWild && !c.isJoker);
+  if (nonWild.length === 0) return TRUMP_RANK === '2' ? 15 : 14.7;
+  // 找出现最多的rank的power
+  const rc = {};
+  nonWild.forEach(c => { rc[c.rank] = (rc[c.rank] || 0) + 1; });
+  let maxR = null, maxC = 0;
+  for (const r in rc) {
+    if (rc[r] > maxC || (rc[r] === maxC && getPower({rank:r,suit:'♣',isJoker:false,isWild:false}) > getPower({rank:maxR,suit:'♣',isJoker:false,isWild:false}))) {
+      maxC = rc[r]; maxR = r;
+    }
+  }
+  return getPower({rank:maxR, suit:'♣', isJoker:false, isWild:false});
+}
+
+// 创建108张牌（两副牌+4张王）
+function createDeck() {
+  const deck = [];
+  let id = 0;
+  for (let copy = 0; copy < 2; copy++) {
+    for (const suit of SUITS) {
+      for (const rank of RANKS) {
+        deck.push({
+          id: id++, suit, rank,
+          isJoker: false,
+          isWild: (suit === WILD_SUIT && rank === TRUMP_RANK),
+          power: 0
+        });
+      }
+    }
+    deck.push({ id: id++, suit: '', rank: '小王', isJoker: true, isWild: false, power: 0 });
+    deck.push({ id: id++, suit: '', rank: '大王', isJoker: true, isWild: false, power: 0 });
+  }
+  deck.forEach(c => c.power = getPower(c));
+  return deck;
+}
+
+// 洗牌
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// 发牌（4家×27张）
+function dealCards(deck) {
+  const hands = [[], [], [], []];
+  for (let i = 0; i < deck.length; i++) hands[i % 4].push(deck[i]);
+  hands.forEach(h => h.sort((a, b) => b.power - a.power));
+  return hands;
+}
+
+// 初始化游戏
+function initGame() {
+  const possible = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+  TRUMP_RANK = possible[Math.floor(Math.random() * possible.length)];
+  document.getElementById('trumpD').textContent = `打${TRUMP_RANK} · ♥${TRUMP_RANK}逢人配`;
+  const deck = shuffle(createDeck());
+  const hands = dealCards(deck);
+  return { hands, trump: TRUMP_RANK };
+}
+
+// ==================== MODULE 2: RULE & COMPARISON ENGINE ====================
+// 按 rank 分组
+function groupByRank(cards) {
+  const groups = {};
+  const wilds = [];
+  cards.forEach(c => {
+    if (c.isWild) { wilds.push(c); }
+    else {
+      const key = c.isJoker ? `JK_${c.rank}` : c.rank;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(c);
+    }
+  });
+  if (wilds.length > 0) {
+    const entries = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+    if (entries.length > 0) entries[0][1].push(...wilds);
+    else groups['WILD'] = wilds;
+  }
+  return groups;
+}
+
+function groupByRankSimple(cards) {
+  const groups = {};
+  cards.forEach(c => {
+    const key = c.isJoker ? `JK_${c.rank}` : (c.isWild ? 'WILD' : c.rank);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(c);
+  });
+  return groups;
+}
+
+// 牌型识别器 — 返回 {type, power, n, level?}
+// 炸弹level: 4炸=L4, 5炸=L5, 同花顺=L5.5, 6炸=L6, 7炸=L7, 8炸=L8, 四王=L99
+function detectType(cards) {
+  if (!cards || !cards.length) return null;
+  const n = cards.length;
+  const jokers = cards.filter(c => c.isJoker);
+  const wilds = cards.filter(c => c.isWild);
+  const regular = cards.filter(c => !c.isJoker && !c.isWild);
+  const nJ = jokers.length;
+  const nW = wilds.length;
+
+  // 四王（2小+2大）
+  if (n === 4 && nJ === 4) {
+    const small = jokers.filter(c => c.rank === '小王').length;
+    const big = jokers.filter(c => c.rank === '大王').length;
+    if (small === 2 && big === 2) return { type: 'ROCKET', power: 9999, n: 4, level: 99 };
+  }
+
+  // 单张
+  if (n === 1) return { type: 'SINGLE', power: cards[0].power, n: 1 };
+
+  // 对子
+  if (n === 2) {
+    const nonWild = cards.filter(c => !c.isWild);
+    if (nonWild.length === 0 || (nonWild.length === 2 && nonWild[0].rank === nonWild[1].rank) || (nonWild.length === 1 && nW === 1)) {
+      return { type: 'PAIR', power: getKeyPower(cards), n: 2 };
+    }
+  }
+
+  // 三条
+  if (n === 3) {
+    const groups = groupByRank(cards);
+    const vals = Object.values(groups);
+    if (vals.length === 1 || vals.some(v => v.length >= 3)) {
+      return { type: 'TRIPLE', power: getKeyPower(cards), n: 3 };
+    }
+  }
+
+  // 三带对（5张：3同+1对）
+  if (n === 5) {
+    const groups = groupByRank(cards);
+    const entries = Object.entries(groups);
+    let triple = null, pair = null;
+    for (const [key, vals] of entries) {
+      if (vals.length >= 3 && !triple) triple = { key, vals };
+      else if (vals.length >= 2) pair = { key, vals };
+    }
+    if (triple && pair) {
+      const tripleRank = triple.key === 'WILD' ? TRUMP_RANK : triple.key;
+      return { type: 'TRI_PAIR', power: getPower({rank: tripleRank, suit:'♣', isJoker:false, isWild:false}), n: 5 };
+    }
+  }
+
+  // 炸弹（≥4同rank，不含王）
+  if (n >= 4 && nJ === 0) {
+    const groups = groupByRank(cards);
+    const entries = Object.entries(groups);
+    // 同一rank的≥4张
+    if (entries.length === 1) {
+      const rank = entries[0][0] === 'WILD' ? TRUMP_RANK : entries[0][0];
+      const level = n; // 4炸=L4, 5炸=L5, 6炸=L6...
+      return { type: 'BOMB', power: getPower({rank, suit:'♣', isJoker:false, isWild:false}) + (n - 4) * 100, n, level };
+    }
+  }
+
+  // 同花顺（5张同花色连续，不含2/王/级牌）
+  if (n === 5 && nJ === 0) {
+    const nonWild = cards.filter(c => !c.isWild);
+    if (nonWild.length > 0) {
+      const suit = nonWild[0].suit;
+      const sameSuit = nonWild.every(c => c.suit === suit);
+      if (sameSuit) {
+        // 检查连续性（允许逢人配填补）
+        const allRanks = cards.map(c => {
+          if (c.isWild) return null;
+          return BASE_POWER[c.rank];
+        }).filter(v => v !== null && v < 15 && BASE_POWER[Object.keys(BASE_POWER).find(k => BASE_POWER[k] === v)] !== undefined);
+        // 获取非万能牌的rank值，排除2和级牌
+        const validPowers = nonWild.filter(c => c.rank !== '2' && c.rank !== TRUMP_RANK).map(c => BASE_POWER[c.rank]);
+        if (validPowers.length > 0) {
+          const unique = [...new Set(validPowers)].sort((a, b) => a - b);
+          const gaps = unique[unique.length - 1] - unique[0] + 1 - unique.length;
+          if (gaps <= nW && unique.length + nW === 5 && unique[unique.length - 1] < 15) {
+            return { type: 'FLUSH', power: unique[unique.length - 1], n: 5, level: 5.5, suit };
+          }
+        }
+      }
+    }
+  }
+
+  // 顺子（≥5连续单张，不含2/王/级牌，允许逢人配补断）
+  if (n >= 5 && nJ === 0) {
+    const validCards = cards.filter(c => !c.isWild && c.rank !== '2' && c.rank !== TRUMP_RANK);
+    if (validCards.length > 0 || nW > 0) {
+      const uniquePowers = [...new Set(validCards.map(c => BASE_POWER[c.rank]))].sort((a, b) => a - b);
+      if (uniquePowers.length > 0) {
+        // 非万能牌最大值 < 15（不含2）
+        if (uniquePowers[uniquePowers.length - 1] < 15) {
+          const gaps = uniquePowers[uniquePowers.length - 1] - uniquePowers[0] + 1 - uniquePowers.length;
+          if (gaps <= nW) {
+            // 可以用逢人配填补
+            const totalNonWild = uniquePowers.length;
+            if (totalNonWild + nW === n && gaps <= nW) {
+              return { type: 'STRAIGHT', power: uniquePowers[uniquePowers.length - 1] + (nW > gaps ? 0 : 0), n };
+            }
+          }
+          // 也检查纯连续（无逢人配或已全用完的情况）
+          if (nW === 0 && uniquePowers.length === n && uniquePowers[uniquePowers.length-1] - uniquePowers[0] === n - 1) {
+            return { type: 'STRAIGHT', power: uniquePowers[uniquePowers.length-1], n };
+          }
+        }
+      }
+    }
+  }
+
+  // 连对（≥3连续对，不含2/王/级牌）
+  if (n >= 6 && n % 2 === 0 && nJ === 0) {
+    const groups = groupByRank(cards);
+    const pairs = Object.entries(groups)
+      .filter(([k, v]) => v.length >= 2 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
+      .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+    const np = n / 2;
+    if (pairs.length >= np) {
+      const ranks = pairs.map(([k]) => BASE_POWER[k]);
+      for (let i = 0; i <= pairs.length - np; i++) {
+        const seq = ranks.slice(i, i + np);
+        if (seq[seq.length - 1] - seq[0] === np - 1) {
+          return { type: 'PAIR_SEQ', power: seq[seq.length - 1], n, pairCount: np };
+        }
+      }
+    }
+  }
+
+  // 钢板（≥2连续三条，不含2/王/级牌）
+  if (n >= 6 && n % 3 === 0 && nJ === 0) {
+    const groups = groupByRank(cards);
+    const triples = Object.entries(groups)
+      .filter(([k, v]) => v.length >= 3 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
+      .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+    const nt = n / 3;
+    if (triples.length >= nt) {
+      const ranks = triples.map(([k]) => BASE_POWER[k]);
+      for (let i = 0; i <= triples.length - nt; i++) {
+        const seq = ranks.slice(i, i + nt);
+        if (seq[seq.length - 1] - seq[0] === nt - 1) {
+          return { type: 'PLATE', power: seq[seq.length - 1], n, tripleCount: nt };
+        }
+      }
+    }
+  }
+
+  // 飞机（钢板+等量对子翅膀）
+  if (n >= 10 && n % 5 === 0 && nJ === 0) {
+    const groups = groupByRank(cards);
+    const triples = Object.entries(groups)
+      .filter(([k, v]) => v.length >= 3 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
+      .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+    const nt = n / 5;
+    for (let len = triples.length; len >= nt; len--) {
+      for (let i = 0; i <= triples.length - len; i++) {
+        const seq = triples.slice(i, i + len);
+        const ranks = seq.map(([k]) => BASE_POWER[k]);
+        if (ranks[ranks.length - 1] - ranks[0] === len - 1) {
+          const usedIds = new Set(seq.flatMap(([_, v]) => v.slice(0, 3)).map(c => c.id));
+          const remaining = cards.filter(c => !usedIds.has(c.id));
+          if (remaining.length === len * 2) {
+            const remGroups = groupByRank(remaining);
+            if (Object.values(remGroups).every(v => v.length >= 2)) {
+              return { type: 'AIRPLANE', power: ranks[0], n, tripleCount: len };
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+// 大小比较引擎
+function canBeat(prev, curr) {
+  if (!prev) return true;
+  if (curr.type === 'ROCKET') return true;
+  if (prev.type === 'ROCKET') return false;
+
+  const currIsBomb = ['BOMB', 'FLUSH', 'ROCKET'].includes(curr.type);
+  const prevIsBomb = ['BOMB', 'FLUSH', 'ROCKET'].includes(prev.type);
+
+  // 炸弹 vs 非炸弹
+  if (!prevIsBomb && currIsBomb) return true;
+  if (prevIsBomb && !currIsBomb) return false;
+
+  // 炸弹 vs 炸弹 — 比level
+  if (prevIsBomb && currIsBomb) {
+    const currLevel = curr.type === 'FLUSH' ? 5.5 : (curr.level || 4);
+    const prevLevel = prev.type === 'FLUSH' ? 5.5 : (prev.level || 4);
+    if (currLevel !== prevLevel) return currLevel > prevLevel;
+    return curr.power > prev.power;
+  }
+
+  // 普通牌型：同类型+同张数才能比
+  if (prev.type === curr.type && prev.n === curr.n) {
+    return curr.power > prev.power;
+  }
+
+  return false;
+}
+
+// ==================== MODULE 3: SORTING ASSESSMENT ====================
+// 贪心理牌算法
+function decomposeHand(hand) {
+  const remaining = [...hand];
+  const groups = [];
+
+  function removeUsed(ids) {
+    const s = new Set(ids);
+    for (let i = remaining.length - 1; i >= 0; i--) {
+      if (s.has(remaining[i].id)) remaining.splice(i, 1);
+    }
+  }
+
+  // 1. 四王
+  const jokers = remaining.filter(c => c.isJoker);
+  if (jokers.length === 4) {
+    const small = jokers.filter(c => c.rank === '小王').length;
+    const big = jokers.filter(c => c.rank === '大王').length;
+    if (small === 2 && big === 2) {
+      groups.push({ type: 'ROCKET', cards: [...jokers] });
+      removeUsed(jokers.map(c => c.id));
+    }
+  }
+
+  // 2. 炸弹（≥4同rank）
+  const rg1 = groupByRankSimple(remaining);
+  for (const key in rg1) {
+    const cards = rg1[key];
+    if (cards.length >= 4 && !cards[0].isJoker) {
+      groups.push({ type: 'BOMB', cards: [...cards], level: cards.length });
+      removeUsed(cards.map(c => c.id));
+    }
+  }
+
+  // 3. 同花顺
+  const bySuit = {};
+  remaining.filter(c => !c.isWild && !c.isJoker && BASE_POWER[c.rank] < 15 && c.rank !== TRUMP_RANK)
+    .forEach(c => { if (!bySuit[c.suit]) bySuit[c.suit] = []; bySuit[c.suit].push(c); });
+
+  for (const suit in bySuit) {
+    bySuit[suit].sort((a, b) => BASE_POWER[a.rank] - BASE_POWER[b.rank]);
+    const unique = [...new Map(bySuit[suit].map(c => [c.rank, c])).values()];
+    for (let len = Math.min(unique.length, 13); len >= 5; len--) {
+      for (let i = 0; i <= unique.length - len; i++) {
+        const sub = unique.slice(i, i + len);
+        const ranks = sub.map(c => BASE_POWER[c.rank]);
+        if (ranks[ranks.length-1] - ranks[0] === len - 1) {
+          groups.push({ type: 'FLUSH', cards: sub });
+          removeUsed(sub.map(c => c.id));
+          break;
+        }
+      }
+      if (groups.some(g => g.type === 'FLUSH')) break;
+    }
+  }
+
+  // 4. 顺子（≥5连续）
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const sc = remaining.filter(c => !c.isJoker && BASE_POWER[c.rank] < 15 && c.rank !== TRUMP_RANK);
+    sc.sort((a, b) => BASE_POWER[a.rank] - BASE_POWER[b.rank]);
+    const unique = [...new Map(sc.map(c => [c.rank, c])).values()];
+    for (let len = Math.min(unique.length, 13); len >= 5; len--) {
+      for (let i = 0; i <= unique.length - len; i++) {
+        const sub = unique.slice(i, i + len);
+        const ranks = sub.map(c => BASE_POWER[c.rank]);
+        if (ranks[ranks.length-1] - ranks[0] === len - 1) {
+          groups.push({ type: 'STRAIGHT', cards: sub });
+          removeUsed(sub.map(c => c.id));
+          break;
+        }
+      }
+      if (groups.some(g => g.type === 'STRAIGHT')) break;
+    }
+  }
+
+  // 5. 连对（≥3连续对）
+  const pairGroups = groupByRankSimple(remaining);
+  const pairs = Object.entries(pairGroups)
+    .filter(([k, v]) => v.length >= 2 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
+    .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+  if (pairs.length >= 3) {
+    const ranks = pairs.map(([k]) => BASE_POWER[k]);
+    for (let len = Math.min(pairs.length, 10); len >= 3; len--) {
+      for (let i = 0; i <= pairs.length - len; i++) {
+        const seq = ranks.slice(i, i + len);
+        if (seq[seq.length - 1] - seq[0] === len - 1) {
+          const pairCards = pairs.slice(i, i + len).flatMap(([_, v]) => v.slice(0, 2));
+          groups.push({ type: 'PAIR_SEQ', cards: pairCards, pairCount: len });
+          removeUsed(pairCards.map(c => c.id));
+          break;
+        }
+      }
+      if (groups.some(g => g.type === 'PAIR_SEQ')) break;
+    }
+  }
+
+  // 6. 钢板（≥2连续三条）
+  const tripGroups = groupByRankSimple(remaining);
+  const triples = Object.entries(tripGroups)
+    .filter(([k, v]) => v.length >= 3 && BASE_POWER[k] < 15 && k !== TRUMP_RANK)
+    .sort((a, b) => BASE_POWER[a[0]] - BASE_POWER[b[0]]);
+  if (triples.length >= 2) {
+    const ranks = triples.map(([k]) => BASE_POWER[k]);
+    for (let len = Math.min(triples.length, 4); len >= 2; len--) {
+      for (let i = 0; i <= triples.length - len; i++) {
+        const seq = ranks.slice(i, i + len);
+        if (seq[seq.length - 1] - seq[0] === len - 1) {
+          const tripCards = triples.slice(i, i + len).flatMap(([_, v]) => v.slice(0, 3));
+          groups.push({ type: 'PLATE', cards: tripCards, tripleCount: len });
+          removeUsed(tripCards.map(c => c.id));
+          break;
+        }
+      }
+      if (groups.some(g => g.type === 'PLATE')) break;
+    }
+  }
+
+  // 7. 三带对
+  const rg3 = groupByRankSimple(remaining);
+  const tripleEntries = Object.entries(rg3).filter(([k, v]) => v.length >= 3);
+  for (const [tr, tc] of tripleEntries) {
+    const tc3 = tc.slice(0, 3);
+    let bestPair = null;
+    for (const [pr, pc] of Object.entries(rg3)) {
+      if (pr !== tr && pc.length >= 2) {
+        if (!bestPair || BASE_POWER[pr] < BASE_POWER[bestPair[0]]) bestPair = [pr, pc];
+      }
+    }
+    if (bestPair) {
+      const pair = bestPair[1].slice(0, 2);
+      groups.push({ type: 'TRI_PAIR', cards: [...tc3, ...pair] });
+      removeUsed([...tc3, ...pair].map(c => c.id));
+    } else {
+      groups.push({ type: 'TRIPLE', cards: tc3 });
+      removeUsed(tc3.map(c => c.id));
+    }
+  }
+
+  // 8. 对子
+  const rg4 = groupByRankSimple(remaining);
+  for (const key in rg4) {
+    const cards = rg4[key];
+    if (cards.length >= 2) {
+      groups.push({ type: 'PAIR', cards: cards.slice(0, 2) });
+      removeUsed(cards.slice(0, 2).map(c => c.id));
+    }
+  }
+
+  // 9. 单张
+  remaining.forEach(c => groups.push({ type: 'SINGLE', cards: [c] }));
+
+  return groups;
+}
+
+function dedupeByRank(cards) {
+  return [...new Map(cards.map(c => [c.rank, c])).values()];
+}
+
+// 理牌评分
+function evaluateSorting(userGroups, optimalCount) {
+  const userCount = userGroups.length;
+  for (const g of userGroups) {
+    const dt = detectType(g.cards);
+    if (!dt) return { valid: false, error: `牌组"${g.cards.map(c=>c.rank).join(',')}"不合法` };
+  }
+  const totalCards = userGroups.reduce((s, g) => s + g.cards.length, 0);
+  if (totalCards !== 27) return { valid: false, error: `只用了${totalCards}张牌，必须用完27张` };
+
+  const diff = userCount - optimalCount;
+  let grade, message, color;
+  if (diff <= 0) { grade = 'S'; message = 'S 级理牌！阵型极佳！'; color = 'var(--green)'; }
+  else if (diff <= 1) { grade = 'A'; message = 'A 级理牌！接近最优！'; color = 'var(--blue)'; }
+  else if (diff <= 3) { grade = 'B'; message = 'B 级理牌，还有优化空间'; color = 'var(--accent)'; }
+  else { grade = 'C'; message = 'C 级理牌，建议重新整理'; color = 'var(--red)'; }
+
+  const bombs = userGroups.filter(g => ['BOMB','FLUSH','ROCKET'].includes(g.type)).length;
+  const singles = userGroups.filter(g => g.type === 'SINGLE').length;
+
+  return { valid: true, grade, message, color, userCount, optimalCount, diff, bombs, singles };
+}
+
+// ==================== MODULE 4: COMBAT SIMULATION ====================
+const GAME_STATE = {
+  hands: [[], [], [], []], // 0=玩家, 1=下家(敌), 2=对家(友), 3=上家(敌)
+  curPlayer: 0,
+  lastPlay: null,
+  passCount: 0,
+  selectedCards: [],
+  started: false,
+  over: false,
+  round: 1,
+  scores: [0, 0],
+  gameLog: [],
+  blockedPartner: false,  // 是否压了搭档
+  letXiajiaRun: false     // 是否让下家接风
+};
+
+function isPartner(a, b) { return (a % 2) === (b % 2); }
+function playerName(i) { return ['你', '下家(敌)', '对家(友)', '上家(敌)'][i]; }
+
+function startNewGame() {
+  const game = initGame();
+  GAME_STATE.hands = game.hands;
+  GAME_STATE.curPlayer = 0;
+  GAME_STATE.lastPlay = null;
+  GAME_STATE.passCount = 0;
+  GAME_STATE.selectedCards = [];
+  GAME_STATE.started = true;
+  GAME_STATE.over = false;
+  GAME_STATE.gameLog = [];
+  GAME_STATE.blockedPartner = false;
+  GAME_STATE.letXiajiaRun = false;
+
+  logGame(`第${GAME_STATE.round}局开始，打${TRUMP_RANK}`);
+  renderGame();
+  updateStatus('你的回合，请选牌出牌');
+  document.getElementById('gBtns').style.display = 'flex';
+  document.getElementById('gReview').style.display = 'none';
+  document.getElementById('gDecomp').style.display = 'none';
+
+  const optimal = decomposeHand(GAME_STATE.hands[0]);
+  document.getElementById('gInfo').textContent = `理牌：${optimal.length}手`;
+}
+
+function logGame(msg) { GAME_STATE.gameLog.push(`[第${GAME_STATE.round}局] ${msg}`); }
+
+function renderGame() {
+  renderHand();
+  renderPlayerInfo();
+  const la = document.getElementById('laCards');
+  const lb = document.getElementById('laLbl');
+  la.innerHTML = '';
+
+  if (GAME_STATE.lastPlay) {
+    lb.textContent = `${playerName(GAME_STATE.lastPlay.who)} 出了：`;
+    GAME_STATE.lastPlay.cards.forEach(c => la.appendChild(createCardEl(c, true)));
+  } else if (GAME_STATE.started) {
+    lb.textContent = '新回合·自由出牌';
+  }
+  const optimal = decomposeHand(GAME_STATE.hands[0]);
+  document.getElementById('gInfo').textContent = `理牌：${optimal.length}手 | 剩余：${GAME_STATE.hands[0].length}张`;
+}
+
+function renderHand() {
+  const container = document.getElementById('gHand');
+  container.innerHTML = '';
+  GAME_STATE.hands[0].forEach(card => {
+    const el = createCardEl(card);
+    if (GAME_STATE.selectedCards.find(c => c.id === card.id)) el.classList.add('sel');
+    el.onclick = () => {
+      if (GAME_STATE.curPlayer !== 0 || GAME_STATE.over) return;
+      const idx = GAME_STATE.selectedCards.findIndex(c => c.id === card.id);
+      if (idx >= 0) GAME_STATE.selectedCards.splice(idx, 1);
+      else GAME_STATE.selectedCards.push(card);
+      renderHand();
+    };
+    container.appendChild(el);
+  });
+}
+
+function renderPlayerInfo() {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById(`pi${i}`);
+    el.querySelector('.ct').textContent = GAME_STATE.hands[i].length + '张';
+    el.classList.toggle('on', GAME_STATE.curPlayer === i);
+  }
+}
+
+function createCardEl(card, small = false) {
+  const div = document.createElement('div');
+  let cls = 'cd' + (small ? ' sm' : '');
+  if (card.isJoker) cls += card.rank === '大王' ? ' jk-b' : ' jk-s';
+  else if (card.isWild) cls += ' wild';
+  else cls += (card.suit === '♥' || card.suit === '♦') ? ' red' : ' blk';
+  div.className = cls;
+  div.innerHTML = card.isJoker
+    ? `<span class="r">${card.rank === '大王' ? '大' : '小'}</span><span class="s">王</span>`
+    : `<span class="r">${card.rank}</span><span class="s">${card.suit}</span>`;
+  return div;
+}
+
+function updateStatus(msg) { document.getElementById('gStat').textContent = msg; }
+
+// 玩家出牌
+function doPlay() {
+  if (GAME_STATE.curPlayer !== 0 || !GAME_STATE.started || GAME_STATE.over) return;
+  if (GAME_STATE.selectedCards.length === 0) { updateStatus('请先选牌！'); return; }
+
+  const sorted = [...GAME_STATE.selectedCards].sort((a, b) => b.power - a.power);
+  const dt = detectType(sorted);
+  if (!dt) { updateStatus('❌ 不合法的牌型'); return; }
+
+  // 检查是否能压牌
+  if (GAME_STATE.lastPlay && GAME_STATE.lastPlay.who !== 0) {
+    // 检查是否压了搭档
+    if (isPartner(GAME_STATE.lastPlay.who, 0)) {
+      GAME_STATE.blockedPartner = true; // 记录压搭档
+    }
+    if (!canBeat(GAME_STATE.lastPlay, dt)) { updateStatus('❌ 管不住！'); return; }
+  }
+
+  // 出牌
+  GAME_STATE.selectedCards.forEach(c => {
+    const idx = GAME_STATE.hands[0].findIndex(x => x.id === c.id);
+    if (idx >= 0) GAME_STATE.hands[0].splice(idx, 1);
+  });
+
+  GAME_STATE.lastPlay = { who: 0, type: dt.type, power: dt.power, n: dt.n, level: dt.level, cards: sorted };
+  GAME_STATE.passCount = 0;
+  GAME_STATE.selectedCards = [];
+  logGame(`你出了${typeLabel(dt.type)}(${dt.n}张)`);
+
+  if (GAME_STATE.hands[0].length === 0) { endGame(0); return; }
+
+  GAME_STATE.curPlayer = 1;
+  renderGame();
+  updateStatus('下家思考中...');
+  document.getElementById('gBtns').style.display = 'none';
+  setTimeout(() => aiTurn(1), 800);
+}
+
+// 玩家过牌
+function doPass() {
+  if (GAME_STATE.curPlayer !== 0 || !GAME_STATE.started || GAME_STATE.over) return;
+  if (!GAME_STATE.lastPlay || GAME_STATE.lastPlay.who === 0) {
+    updateStatus('❌ 自由出牌不能过！');
+    return;
+  }
+
+  logGame('你过牌');
+  GAME_STATE.passCount++;
+  GAME_STATE.selectedCards = [];
+
+  if (GAME_STATE.passCount >= 3) {
+    const freeLeader = GAME_STATE.lastPlay.who;
+    GAME_STATE.lastPlay = null;
+    GAME_STATE.passCount = 0;
+    GAME_STATE.curPlayer = freeLeader;
+    renderGame();
+    if (freeLeader === 0) {
+      updateStatus('你的回合（自由出牌）');
+      document.getElementById('gBtns').style.display = 'flex';
+    } else {
+      updateStatus(playerName(freeLeader) + ' 自由出牌');
+      document.getElementById('gBtns').style.display = 'none';
+      setTimeout(() => aiTurn(freeLeader), 800);
+    }
+    return;
+  }
+
+  GAME_STATE.curPlayer = 1;
+  renderGame();
+  updateStatus('你过牌，下家思考中...');
+  document.getElementById('gBtns').style.display = 'none';
+  setTimeout(() => aiTurn(1), 800);
+}
+
+// ==================== AI BEHAVIOR TREES ====================
+// ==================== AI BEHAVIOR TREES (IMPROVED) ====================
+// Improvements over original:
+// 1. Wild card (逢人配) strategic awareness - prefer non-wild plays, save wilds for critical moments
+// 2. Supporter (P2) smarter free-leading - lead small pairs/singles to feed partner
+// 3. Better bomb timing - don't waste bombs when hand is large, save for endgame
+// 4. Blocker (P1) smarter intercepting - aggressive when opponent has few cards
+// 5. Card count awareness - prioritize blocking opponents with ≤3/5 cards
+
+// --- New helper functions ---
+
+// Check if a play group uses any wild cards (逢人配)
+// Wilds are valuable - AI should prefer plays that don't consume them
+function groupUsesWild(group) {
+  return group.cards.some(c => c.isWild);
+}
+
+// --- Main AI turn function ---
+function aiTurn(player) {
+  if (GAME_STATE.over) return;
+  const hand = GAME_STATE.hands[player];
+  const lastWho = GAME_STATE.lastPlay ? GAME_STATE.lastPlay.who : -1;
+
+  // 自由出牌
+  if (!GAME_STATE.lastPlay) {
+    const play = aiFindPlay(hand, player);
+    if (play) {
+      play.cards.forEach(c => {
+        const idx = hand.findIndex(x => x.id === c.id);
+        if (idx >= 0) hand.splice(idx, 1);
+      });
+      GAME_STATE.lastPlay = { who: player, ...play, cards: play.cards };
+      GAME_STATE.passCount = 0;
+      logGame(`${playerName(player)} 出了${typeLabel(play.type)}`);
+      updateStatus(`${playerName(player)} 出牌`);
+      if (hand.length === 0) { endGame(player); return; }
+    } else {
+      // IMPROVED: Fallback avoids wasting wild cards - play smallest non-wild card
+      const nonWild = hand.filter(c => !c.isWild);
+      const pool = nonWild.length > 0 ? nonWild : hand;
+      const smallest = [...pool].sort((a, b) => a.power - b.power)[0];
+      if (smallest) {
+        hand.splice(hand.indexOf(smallest), 1);
+        GAME_STATE.lastPlay = { who: player, type: 'SINGLE', power: smallest.power, n: 1, cards: [smallest] };
+        GAME_STATE.passCount = 0;
+      }
+    }
+    GAME_STATE.curPlayer = (player + 1) % 4;
+    renderGame();
+    setTimeout(nextTurn, 500);
+    return;
+  }
+
+  // 队友出牌 → 绝对让牌（核心铁律）
+  if (isPartner(player, lastWho)) {
+    updateStatus(`${playerName(player)} 让牌(搭档)`);
+    GAME_STATE.passCount++;
+    if (GAME_STATE.passCount >= 3) {
+      const freeLeader = GAME_STATE.lastPlay.who;
+      GAME_STATE.lastPlay = null;
+      GAME_STATE.passCount = 0;
+      GAME_STATE.curPlayer = freeLeader;
+      renderGame();
+      if (freeLeader === 0) {
+        updateStatus('你的回合（自由出牌）');
+        document.getElementById('gBtns').style.display = 'flex';
+      } else {
+        setTimeout(() => aiTurn(freeLeader), 500);
+      }
+      return;
+    }
+    GAME_STATE.curPlayer = (player + 1) % 4;
+    renderGame();
+    setTimeout(nextTurn, 500);
+    return;
+  }
+
+  // AI找牌压
+  const play = aiFindPlay(hand, player);
+
+  if (play) {
+    play.cards.forEach(c => {
+      const idx = hand.findIndex(x => x.id === c.id);
+      if (idx >= 0) hand.splice(idx, 1);
+    });
+    GAME_STATE.lastPlay = { who: player, ...play, cards: play.cards };
+    GAME_STATE.passCount = 0;
+    logGame(`${playerName(player)} 出了${typeLabel(play.type)}`);
+    updateStatus(`${playerName(player)} 出牌`);
+    if (hand.length === 0) { endGame(player); return; }
+  } else {
+    GAME_STATE.passCount++;
+    logGame(`${playerName(player)} 过`);
+    updateStatus(`${playerName(player)} 过`);
+    if (GAME_STATE.passCount >= 3) {
+      const freeLeader = GAME_STATE.lastPlay.who;
+      GAME_STATE.lastPlay = null;
+      GAME_STATE.passCount = 0;
+      GAME_STATE.curPlayer = freeLeader;
+      renderGame();
+      if (freeLeader === 0) {
+        updateStatus('你的回合（自由出牌）');
+        document.getElementById('gBtns').style.display = 'flex';
+      } else {
+        setTimeout(() => aiTurn(freeLeader), 500);
+      }
+      return;
+    }
+  }
+
+  GAME_STATE.curPlayer = (player + 1) % 4;
+  renderGame();
+  setTimeout(nextTurn, 500);
+}
+
+// IMPROVED AI找牌逻辑（四系行为树 + 逢人配意识 + 卡数感知）
+function aiFindPlay(hand, player) {
+  const decomp = decomposeHand(hand);
+  const handCount = hand.length;
+
+  // Helper: pick first non-wild group from a sorted list, fallback to first if all use wilds
+  function pickSafe(groups) {
+    const safe = groups.filter(g => !groupUsesWild(g));
+    return safe.length > 0 ? safe[0] : (groups.length > 0 ? groups[0] : null);
+  }
+
+  const isBomb = (t) => ['BOMB', 'ROCKET', 'FLUSH'].includes(t);
+
+  // ---- 自由出牌 ----
+  if (!GAME_STATE.lastPlay) {
+    const singles = decomp.filter(g => g.type === 'SINGLE').sort((a,b) => a.cards[0].power - b.cards[0].power);
+    const pairs = decomp.filter(g => g.type === 'PAIR').sort((a,b) => a.cards[0].power - b.cards[0].power);
+    const triPairs = decomp.filter(g => g.type === 'TRI_PAIR');
+    const longs = decomp.filter(g => ['STRAIGHT','PAIR_SEQ','PLATE','AIRPLANE'].includes(g.type));
+    const bombs = decomp.filter(g => isBomb(g.type));
+
+    // 下家(Blocker): 防守型，先出小牌试探，优先不消耗逢人配
+    if (player === 1) {
+      // Check if opponent (P0 or P2) is close to winning - if so, lead stronger
+      const minOppCards = Math.min(GAME_STATE.hands[0].length, GAME_STATE.hands[2].length);
+      if (minOppCards <= 3 && bombs.length > 0) {
+        // Opponent very close - lead bombs to try to run out
+        return buildPlay(bombs[0]);
+      }
+      const choice = pickSafe(singles) || pickSafe(pairs) || pickSafe(triPairs);
+      if (choice) return buildPlay(choice);
+      return buildPlay(decomp[0]);
+    }
+
+    // 对家(Supporter): 配合型，喂小牌给搭档(P0)接
+    // IMPROVED: Lead small pairs (power≤10) first - pairs are easier for partner to beat
+    //          without committing big cards. Then small singles. Avoid using wilds.
+    if (player === 2) {
+      const safePairs = pairs.filter(g => !groupUsesWild(g));
+      const safeSingles = singles.filter(g => !groupUsesWild(g));
+
+      // Small pairs (rank ≤10) are ideal - partner can easily beat them
+      const smallPairs = safePairs.filter(g => g.cards[0].power <= 10);
+      if (smallPairs.length > 0) return buildPlay(smallPairs[0]);
+
+      // Small singles (rank ≤10)
+      const smallSingles = safeSingles.filter(g => g.cards[0].power <= 10);
+      if (smallSingles.length > 0) return buildPlay(smallSingles[0]);
+
+      // Any safe pair (non-wild)
+      if (safePairs.length > 0) return buildPlay(safePairs[0]);
+
+      // Any safe single (non-wild)
+      if (safeSingles.length > 0) return buildPlay(safeSingles[0]);
+
+      // Fallback to any pair/single (may use wild, but no choice)
+      if (pairs.length > 0) return buildPlay(pairs[0]);
+      if (singles.length > 0) return buildPlay(singles[0]);
+      return buildPlay(decomp[0]);
+    }
+
+    // 上家(Opportunist): 干扰型，打长牌消耗对手
+    if (player === 3) {
+      if (longs.length > 0) return buildPlay(longs[0]);
+      if (triPairs.length > 0) return buildPlay(triPairs[0]);
+      const choice = pickSafe(pairs) || pickSafe(singles);
+      if (choice) return buildPlay(choice);
+      return buildPlay(decomp[0]);
+    }
+
+    return buildPlay(decomp[0]);
+  }
+
+  // ---- 需要压牌 ----
+  const lp = GAME_STATE.lastPlay;
+  const candidates = [];
+
+  for (const g of decomp) {
+    const dt = detectType(g.cards);
+    if (!dt) continue;
+    // 同类型同张数
+    if (dt.type === lp.type && dt.n === lp.n && dt.power > lp.power) candidates.push({ play: dt, group: g });
+    // 炸弹压非炸弹
+    if (isBomb(dt.type) && !isBomb(lp.type)) candidates.push({ play: dt, group: g });
+    // 炸弹内战
+    if (isBomb(dt.type) && isBomb(lp.type)) {
+      if (canBeat(lp, dt)) candidates.push({ play: dt, group: g });
+    }
+  }
+
+  // IMPROVED sort: prefer non-wild plays first, then by power (cheapest first)
+  // This ensures AI uses natural plays before consuming wild cards
+  candidates.sort((a, b) => {
+    const aW = groupUsesWild(a.group) ? 1 : 0;
+    const bW = groupUsesWild(b.group) ? 1 : 0;
+    if (aW !== bW) return aW - bW;
+    return a.play.power - b.play.power;
+  });
+
+  // 下家(Blocker): 紧盯对手，积极压牌
+  // IMPROVED: Check BOTH opponents' card counts (P0 & P2), use bombs when either is close
+  if (player === 1) {
+    const minOppCards = Math.min(GAME_STATE.hands[0].length, GAME_STATE.hands[2].length);
+
+    for (const c of candidates) {
+      if (isBomb(c.play.type)) {
+        // IMPROVED bomb timing: use bombs when opponent is close OR self is in endgame
+        if (minOppCards <= 3) return buildPlay(c.group);  // opponent critical
+        if (minOppCards <= 5) return buildPlay(c.group);  // opponent close
+        if (handCount <= 5) return buildPlay(c.group);    // self endgame
+        continue; // save bombs for later
+      }
+      // Non-bomb: always beat (the sorted candidates already prefer non-wild)
+      return buildPlay(c.group);
+    }
+    return null;
+  }
+
+  // 对家(Supporter): 保存实力，绝不压搭档（此分支只走到对手牌）
+  // IMPROVED: Save bombs for critical moments, save wilds when possible
+  if (player === 2) {
+    const minOppCards = Math.min(GAME_STATE.hands[1].length, GAME_STATE.hands[3].length);
+
+    for (const c of candidates) {
+      if (isBomb(c.play.type)) {
+        // Only use bombs when opponents are dangerously close or self is endgame
+        if (minOppCards <= 3) return buildPlay(c.group);
+        if (handCount <= 4) return buildPlay(c.group);
+        continue;
+      }
+      // Non-bomb: use if non-wild, OR if opponents are critical (≤3 cards)
+      if (!groupUsesWild(c.group) || minOppCards <= 3) return buildPlay(c.group);
+      // IMPROVED: Skip wild-using plays when not critical - save 逢人配
+    }
+    return null; // 让牌
+  }
+
+  // 上家(Opportunist): 选择性压
+  // IMPROVED: Check both opponents' card counts, smarter bomb usage
+  if (player === 3) {
+    const minOppCards = Math.min(GAME_STATE.hands[0].length, GAME_STATE.hands[2].length);
+
+    for (const c of candidates) {
+      if (isBomb(c.play.type)) {
+        if (minOppCards <= 3) return buildPlay(c.group);  // opponent critical
+        if (handCount <= 6) return buildPlay(c.group);    // self endgame
+        continue;
+      }
+      return buildPlay(c.group);
+    }
+  }
+
+  return null;
+}
+
+function typeLabel(type) {
+  return {'SINGLE':'单张','PAIR':'对子','TRIPLE':'三条','TRI_PAIR':'三带对',
+    'STRAIGHT':'顺子','PAIR_SEQ':'连对','PLATE':'钢板','AIRPLANE':'飞机',
+    'BOMB':'炸弹','FLUSH':'同花顺','ROCKET':'四王'}[type] || type;
+}
+
+function nextTurn() {
+  if (GAME_STATE.over) return;
+  if (GAME_STATE.lastPlay && GAME_STATE.curPlayer === GAME_STATE.lastPlay.who) {
+    GAME_STATE.lastPlay = null;
+    GAME_STATE.passCount = 0;
+  }
+  if (GAME_STATE.curPlayer === 0) {
+    const msg = GAME_STATE.lastPlay ? `你的回合，压过${playerName(GAME_STATE.lastPlay.who)}的牌` : '你的回合（自由出牌）';
+    updateStatus(msg);
+    document.getElementById('gBtns').style.display = 'flex';
+    renderGame();
+  } else {
+    document.getElementById('gBtns').style.display = 'none';
+    setTimeout(() => aiTurn(GAME_STATE.curPlayer), 500);
+  }
+}
+
+// 游戏结束 + 战后复盘
+function endGame(winner) {
+  GAME_STATE.over = true;
+  document.getElementById('gBtns').style.display = 'none';
+  const ourWin = isPartner(winner, 0);
+  if (ourWin) GAME_STATE.scores[0]++;
+  else GAME_STATE.scores[1]++;
+
+  const who = playerName(winner);
+  const msg = ourWin ? `🎉 你方赢了！${who}先跑完` : `😞 对方赢了，${who}先跑完`;
+  updateStatus(msg);
+  logGame(msg);
+
+  // 战后复盘
+  const review = [];
+  if (GAME_STATE.blockedPartner) review.push('<span class="warn">⚠️ 你压了搭档的牌！对家出牌=绿灯，绝对让牌。</span>');
+  if (GAME_STATE.hands[1].length === 0 && !ourWin) review.push('<span class="warn">⚠️ 你让下家接风了！下次注意拦截。</span>');
+  if (!GAME_STATE.blockedPartner && (GAME_STATE.hands[1].length > 0 || ourWin)) review.push('<span class="good">✅ 配合意识良好，继续保持。</span>');
+
+  const reviewEl = document.getElementById('gReview');
+  reviewEl.style.display = 'block';
+  reviewEl.innerHTML = '<b>📊 战后复盘：</b><br>' + review.join('<br>');
+
+  const la = document.getElementById('laCards');
+  la.innerHTML = '';
+  document.getElementById('laLbl').textContent = msg;
+
+  setTimeout(() => {
+    if (confirm(ourWin ? '再来一局？' : '不服？再来！')) {
+      GAME_STATE.round++;
+      startNewGame();
+    }
+  }, 500);
+}
+
+function showDecomp() {
+  const d = decomposeHand(GAME_STATE.hands[0]);
+  const el = document.getElementById('gDecomp');
+  el.style.display = 'block';
+  const bombs = d.filter(g => ['BOMB','FLUSH','ROCKET'].includes(g.type)).length;
+  const singles = d.filter(g => g.type === 'SINGLE').length;
+  el.innerHTML = `<b>理牌(${d.length}手，${bombs}炸${singles}单)：</b><br>`;
+  d.forEach((g, i) => {
+    const lb = typeLabel(g.type);
+    const cs = g.cards.map(c => c.rank + (c.suit || '')).join(' ');
+    el.innerHTML += `<span class="g"><span class="hl">${i+1}.</span>${lb}: ${cs}</span> `;
+  });
+  if (d.length <= 6) el.innerHTML += `<br><span style="color:var(--green)">🏆 好牌！冲头游</span>`;
+  else if (d.length <= 8) el.innerHTML += `<br><span style="color:var(--accent)">📊 中等牌，配合搭档</span>`;
+  else el.innerHTML += `<br><span style="color:var(--red)">⚠️ 烂牌！做辅助喂搭档</span>`;
+}
+
+// ==================== QUIZ MODES ====================
+let stats = JSON.parse(localStorage.getItem('gd4') || '{"ok":0,"no":0}');
+
+function updateStats() {
+  const total = stats.ok + stats.no;
+  document.getElementById('sOk').textContent = stats.ok;
+  document.getElementById('sNo').textContent = stats.no;
+  document.getElementById('sRt').textContent = (total ? Math.round(stats.ok / total * 100) : 0) + '%';
+  localStorage.setItem('gd4', JSON.stringify(stats));
+}
+
+const TYPE_LABELS = {'SINGLE':'单张','PAIR':'对子','TRIPLE':'三条','TRI_PAIR':'三带对',
+  'STRAIGHT':'顺子','PAIR_SEQ':'连对','PLATE':'钢板','AIRPLANE':'飞机',
+  'BOMB':'炸弹','FLUSH':'同花顺','ROCKET':'四王'};
+
+const ALL_TYPES = [
+  {k:'SINGLE',l:'单张'},{k:'PAIR',l:'对子'},{k:'TRIPLE',l:'三条'},
+  {k:'TRI_PAIR',l:'三带对'},{k:'STRAIGHT',l:'顺子(≥5连)'},
+  {k:'PAIR_SEQ',l:'连对(≥3连对)'},{k:'PLATE',l:'钢板(≥2连三条)'},
+  {k:'AIRPLANE',l:'飞机(钢板+对子翅膀)'},{k:'BOMB',l:'炸弹(≥4同)'},
+  {k:'FLUSH',l:'同花顺'},{k:'ROCKET',l:'四王(最大)'}
+];
+
+// ========== 牌型识别 ==========
+let patState = {cards:[],correct:[],selected:new Set()};
+
+function patNew() {
+  const game = initGame();
+  const deck = game.hands.flat();
+  const n = 3 + Math.floor(Math.random() * 8);
+  const cards = deck.slice(0, n);
+  cards.sort((a, b) => b.power - a.power);
+
+  const correctSet = new Set();
+  const dt = detectType(cards);
+  if (dt) correctSet.add(dt.type);
+  const groups = groupByRankSimple(cards);
+  for (const key in groups) {
+    const cs = groups[key];
+    if (cs.length >= 2) { const t2 = detectType(cs.slice(0,2)); if(t2) correctSet.add(t2.type); }
+    if (cs.length >= 3) { const t3 = detectType(cs.slice(0,3)); if(t3) correctSet.add(t3.type); }
+    if (cs.length >= 4) { const t4 = detectType(cs.slice(0,4)); if(t4) correctSet.add(t4.type); }
+  }
+
+  patState = {cards, correct:[...correctSet], selected:new Set()};
+
+  const c = document.getElementById('patC');
+  c.innerHTML = '';
+  cards.forEach(card => c.appendChild(createCardEl(card)));
+
+  const o = document.getElementById('patO');
+  o.innerHTML = '';
+  ALL_TYPES.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'opt'; div.textContent = t.l; div.dataset.k = t.k;
+    div.onclick = () => {
+      if (patState.selected.has(t.k)) { patState.selected.delete(t.k); div.style.borderColor = 'var(--border)'; }
+      else { patState.selected.add(t.k); div.style.borderColor = 'var(--accent)'; }
+    };
+    o.appendChild(div);
+  });
+  document.getElementById('patFb').style.display = 'none';
+}
+
+function patCheck() {
+  const correct = patState.correct;
+  const selected = [...patState.selected];
+  const ok = correct.length === selected.length && correct.every(t => selected.includes(t));
+  const fb = document.getElementById('patFb');
+  const lbl = correct.map(t => TYPE_LABELS[t] || t).join('、');
+  if (ok) { fb.className = 'fb ok'; fb.innerHTML = `✅ 正确：${lbl}`; stats.ok++; }
+  else { fb.className = 'fb no'; fb.innerHTML = `❌ 答案：${lbl}<br>你选：${selected.map(t => TYPE_LABELS[t]||t).join('、')||'未选'}`; stats.no++; }
+  fb.style.display = 'block';
+  document.querySelectorAll('#patO .opt').forEach(el => {
+    const k = el.dataset.k;
+    if (correct.includes(k)) el.classList.add('ok');
+    else if (patState.selected.has(k)) el.classList.add('no');
+    el.classList.add('dis');
+  });
+  updateStats();
+}
+
+// ========== 大小比较 ==========
+let cmpState = {};
+
+function cmpNew() {
+  const game = initGame();
+  const deck = game.hands.flat();
+  const type = ['SINGLE','PAIR','BOMB'][Math.floor(Math.random()*3)];
+  let a, b;
+  if (type === 'SINGLE') {
+    a = [deck.pop()]; b = [deck.pop()];
+    while (b[0].power === a[0].power) b = [deck.pop()];
+  } else if (type === 'PAIR') {
+    const byRank = {};
+    deck.filter(c => !c.isJoker).forEach(c => { if(!byRank[c.rank]) byRank[c.rank]=[]; byRank[c.rank].push(c); });
+    const pairs = Object.values(byRank).filter(v => v.length >= 2).sort(() => Math.random()-0.5);
+    if (pairs.length >= 2) { a = pairs[0].slice(0,2); b = pairs[1].slice(0,2); }
+    else { a = [deck.pop()]; b = [deck.pop()]; }
+  } else {
+    a = deck.slice(0,4); b = deck.slice(4,8);
+  }
+  a.sort((x,y) => y.power - x.power); b.sort((x,y) => y.power - x.power);
+  const dtA = detectType(a), dtB = detectType(b);
+  let ans = 'DRAW';
+  if (dtA && dtB) {
+    if (canBeat(dtB, dtA)) ans = 'B';
+    else if (canBeat(dtA, dtB)) ans = 'A';
+    else if (dtA.power > dtB.power) ans = 'A';
+    else if (dtB.power > dtA.power) ans = 'B';
+  } else if (dtA && !dtB) ans = 'A';
+  else if (dtB && !dtA) ans = 'B';
+  cmpState = {a, b, ans, dtA, dtB};
+
+  const cA = document.getElementById('cmpA'); cA.innerHTML = '';
+  a.forEach(c => cA.appendChild(createCardEl(c, true)));
+  const cB = document.getElementById('cmpB'); cB.innerHTML = '';
+  b.forEach(c => cB.appendChild(createCardEl(c, true)));
+
+  const o = document.getElementById('cmpO'); o.innerHTML = '';
+  ['A','B','DRAW'].forEach(k => {
+    const div = document.createElement('div');
+    div.className = 'opt';
+    div.textContent = k==='A'?'A 更大':k==='B'?'B 更大':'无法比较';
+    div.onclick = () => {
+      const ok = k === cmpState.ans;
+      const fb = document.getElementById('cmpFb');
+      const al = cmpState.dtA ? TYPE_LABELS[cmpState.dtA.type] : '?';
+      const bl = cmpState.dtB ? TYPE_LABELS[cmpState.dtB.type] : '?';
+      if (ok) { fb.className='fb ok'; fb.innerHTML=`✅ 正确！A=${al}，B=${bl}`; stats.ok++; }
+      else { fb.className='fb no'; fb.innerHTML=`❌ 正确：${cmpState.ans==='A'?'A更大':cmpState.ans==='B'?'B更大':'无法比较'}。A=${al}，B=${bl}`; stats.no++; }
+      fb.style.display = 'block';
+      document.querySelectorAll('#cmpO .opt').forEach((el,i) => {
+        el.classList.add('dis');
+        if (['A','B','DRAW'][i]===cmpState.ans) el.classList.add('ok');
+      });
+      updateStats();
+    };
+    o.appendChild(div);
+  });
+  document.getElementById('cmpFb').style.display = 'none';
+}
+
+// ========== 决策题 ==========
+const SCENARIOS = [
+{q:'你是下贡方，上一局你和搭档输了。你手里有♠A、♥K、♣Q、♦J等散牌，级牌是7。你该贡哪张？',opts:[{t:'贡♠A',c:1,why:'✅ A是最大散牌，贡出去不破坏手牌结构。'},{t:'贡级牌7',c:0,why:'❌ 级牌可以组炸弹或配对，留着价值远大于A。'}]},
+{q:'你是进贡方，手里有4张级牌（炸弹）+红心级牌（逢人配）+其他散牌。对手要求你进贡，你能抗贡吗？',opts:[{t:'可以抗贡',c:1,why:'✅ 拥有炸弹级别的牌可以抗贡，不用进贡。'},{t:'必须进贡最大牌',c:0,why:'❌ 有炸弹可以抗贡，规则允许免贡。'}]},
+{q:'上一局你方输了，你要进贡。手里有♥A、♠A、♣A、♦A（4张A炸弹）和散牌。你贡哪张？',opts:[{t:'贡♥A',c:0,why:'❌ ♥A可能涉及逢人配功能（若级牌是A），且4张A是炸弹应抗贡。'},{t:'抗贡不出牌',c:1,why:'✅ 4张A构成炸弹，符合抗贡条件。'}]},
+{q:'你是赢家，收到对手贡的♥K（当前级牌是8）。还贡时你手里有小对子和单张3-7。你该还什么？',opts:[{t:'还单张3',c:1,why:'✅ 还最小的散牌，不帮对手凑对或顺子。'},{t:'还单张7',c:0,why:'❌ 7靠近级牌8，对手可能借此组成有用的牌型。'}]},
+{q:'你方输了上一局，要贡牌。手里最大是K，但你有3张K（三同张）和一堆散牌。你贡哪张？',opts:[{t:'贡一张K',c:1,why:'✅ 贡最大牌K，三同张拆一张还剩对K可用。'},{t:'贡散牌中最大的J',c:0,why:'❌ 规则要求贡最大牌，K>J必须贡K。'}]},
+{q:'进贡后你还贡。对手贡了你一张大牌，你手里有对3和单张4。还贡选什么？',opts:[{t:'还单张4',c:1,why:'✅ 还小单张，不给对手凑对的机会。'},{t:'还对3中的一张',c:0,why:'❌ 拆自己的对子还贡不明智，且对手可能凑成三同张。'}]},
+{q:'你是上贡方，手里有2张逢人配（♥级牌）+一张A+散牌。你贡哪张？',opts:[{t:'贡A',c:1,why:'✅ 逢人配是万能牌价值极高，必须留住。'},{t:'贡一张逢人配',c:0,why:'❌ 逢人配可替代任意牌，留着组炸弹或顺子更值。'}]},
+{q:'对手贡了你一张♥Q（级牌是J），你要还贡。手里有单张2、单张5、对8。还什么最好？',opts:[{t:'还单张2',c:0,why:'❌ 2在掼蛋中是大牌，不值得轻易送人。'},{t:'还单张5',c:1,why:'✅ 5是最小可用散牌，还出去损失最小。'}]},
+
+{q:'级牌是7，你有♥7（逢人配）+♠7+♣7+♦7。这4张7加逢人配怎么用最优？',opts:[{t:'组成5张炸弹（4张7+逢人配）',c:0,why:'❌ 4张7本身已是炸弹，逢人配加入只多1张，浪费万能牌。'},{t:'4张7当炸弹，逢人配去配其他牌型',c:1,why:'✅ 已有炸弹就别浪费逢人配，让它去配顺子或同花顺。'}]},
+{q:'级牌是5，你有♥5+♠3+♠4+♠6。逢人配怎么用最好？',opts:[{t:'♥5和♠3♠4组成对3',c:0,why:'❌ 用逢人配凑小对子太浪费。'},{t:'♥5替代♠5，组成♠3♠4♠5♠6顺子',c:1,why:'✅ 用逢人配补缺张组成4张顺子，价值远大于小对子。'}]},
+{q:'你有♥8（逢人配，级牌8）+♠J+♣J+♦J+♥J。怎么用逢人配？',opts:[{t:'组成5张J炸弹（含逢人配）',c:1,why:'✅ 5张炸弹威力巨大，可压任何4张炸弹。'},{t:'把♥8当级牌8用，留4张J当炸弹',c:0,why:'❌ 4张J炸弹已被5张炸弹碾压，5张炸弹优先。'}]},
+{q:'残局阶段，你剩5张牌：♥6（逢人配，级牌6）+♠7+♠8+♠9+♠10。怎么出？',opts:[{t:'♥6当♠6，组成♠6-10同花顺一次出完',c:1,why:'✅ 同花顺是最强牌型，一次出完直接获胜。'},{t:'先出顺子♠7-10，留♥6单出',c:0,why:'❌ 分两次出给了对手拦截机会，一次出完才是正确选择。'}]},
+{q:'你有♥K（逢人配，级牌K）+♠A+♣A+♦A。如何使用？',opts:[{t:'♥K当A，组成4张A炸弹',c:1,why:'✅ 4张A炸弹威力大，且A是顶级牌。'},{t:'♥K当K单独出',c:0,why:'❌ 浪费逢人配，白白少了一个炸弹。'}]},
+{q:'级牌是10，你有♥10+♠9+♣9+♦9+♥9。该怎么配？',opts:[{t:'♥10当9，组成5张9炸弹',c:1,why:'✅ 5张炸弹可以压任何4张炸弹，威力巨大。'},{t:'♥10当对10配散牌出',c:0,why:'❌ 舍弃5张炸弹去凑小对子是严重失误。'}]},
+{q:'你有♥Q（逢人配，级牌Q）+♠3+♣3+♦3+♠4+♣4。逢人配配哪里？',opts:[{t:'配3组成4张3炸弹',c:1,why:'✅ 凑炸弹比凑对子优先级高，4张炸弹有压制力。'},{t:'配4组成4张4炸弹',c:0,why:'❌ 虽然也能凑炸弹，但3更小，炸弹越小越灵活。'}]},
+{q:'牌局中期，你有♥J（逢人配，级牌J）+♠Q+♣Q+♠K+♣K+♠A。逢人配怎么用？',opts:[{t:'配Q组成三张Q',c:0,why:'❌ 三同张在掼蛋中不是合法牌型。'},{t:'配成Q-Q-K-K-A的顺子/连对',c:1,why:'✅ 用逢人配补全连对或顺子，最大化出牌效率。'}]},
+{q:'你有♥2（逢人配，级牌是2）+♠A+♣A+♠K+♣K+♦K。怎么用逢人配？',opts:[{t:'配K组成4张K炸弹',c:1,why:'✅ 4张K炸弹比对A对K分散出更有价值。'},{t:'配A组成三张A',c:0,why:'❌ 三同张不合法，配A只能成对A，不如炸弹。'}]},
+{q:'你是头游（第一个出完），搭档还剩很多牌。你最后一手出完时，手里有♥3（逢人配，级牌3）。最佳打法？',opts:[{t:'留逢人配最后单独出',c:0,why:'❌ 单张逢人配容易被管住，搭档难接。'},{t:'逢人配融入最后一手大牌型一次出完',c:1,why:'✅ 把逢人配融入同花顺或炸弹，一锤定音最高效。'}]},
+
+{q:'你是头游已出完，搭档出单张8，下家（对手）要管。你应该怎么配合？',opts:[{t:'不干涉，让搭档自己处理',c:0,why:'❌ 搭档可能需要你帮拆对手的牌。'},{t:'如果手里还有活牌，用炸弹帮搭档抢回牌权',c:1,why:'✅ 头游应配合二游，关键时刻炸掉对手让搭档走牌。'}]},
+{q:'搭档正在出顺子跑牌，对手用更大的顺子管住了。你有炸弹，该炸吗？',opts:[{t:'炸掉对手的顺子',c:1,why:'✅ 搭档在跑牌关键时刻必须支援，帮搭档出完。'},{t:'不炸留着自己用',c:0,why:'❌ 搭档跑牌被打断，不帮忙可能导致双下。'}]},
+{q:'搭档出了一手很大的牌（如炸弹），明显在抢牌权。你接下来该怎么做？',opts:[{t:'用更大的牌管住搭档',c:0,why:'❌ 搭档抢牌权是为了出好牌，你管住等于内耗。'},{t:'不管，让搭档继续出',c:1,why:'✅ 搭档有牌权说明他有计划，配合他出完。'}]},
+{q:'你是先手出牌，搭档上一轮刚出了对7被对手对K管住。你手里有对A，该出什么配合搭档？',opts:[{t:'出对A管住对手的对K',c:1,why:'✅ 管住对手后把牌权转给搭档，让他出牌。'},{t:'出单张试探',c:0,why:'❌ 搭档可能对子多，你该帮他清对子障碍。'}]},
+{q:'你和搭档vs两个对手，你的搭档已经出完（头游），你手里剩3张：单A、对K。对手出单张5。你管吗？',opts:[{t:'出A管住',c:1,why:'✅ 搭档已是头游，你需要尽快出完拿二游。'},{t:'不管等机会',c:0,why:'❌ 不管就浪费出牌机会，应抓紧出完。'}]},
+{q:'搭档出三带二（三个5带对6），下家管了（三个8带对9）。你有三个J，该管吗？',opts:[{t:'管住对手的三带二',c:1,why:'✅ 帮搭档夺回牌权，让他继续出牌。'},{t:'不管留着自己的三带二',c:0,why:'❌ 搭档需要牌权，你应该支援而不是各自为战。'}]},
+{q:'牌局中段，你发现搭档一直在出小牌试探。你手里有同花顺。该怎么配合？',opts:[{t:'立刻出同花顺压场',c:0,why:'❌ 搭档在试探说明手牌不好，你该先观察再出手。'},{t:'先不管，等搭档需要时再用同花顺帮忙',c:1,why:'✅ 大牌留到关键时刻支援搭档更明智。'}]},
+{q:'你的搭档出了一对Q，你的下家（对手）管了一对K。你手里有对2和对A。你该怎么做？',opts:[{t:'出对2管对手的对K',c:0,why:'❌ 对2是大牌留着更有用，用对A管就行。'},{t:'出对A管对手的对K',c:1,why:'✅ 对A管对K刚好，把牌权拿回来给搭档。'}]},
+{q:'搭档出单张4，你是下家。你手里有单张3、5、7、9、K。你该怎么做？',opts:[{t:'出单张3管搭档',c:0,why:'❌ 3比4小管不住，且不该管搭档的牌。'},{t:'不管，让对手管',c:1,why:'✅ 搭档出牌你不能管，让对手去处理。'}]},
+{q:'你是最后出牌的人，搭档和对手都快出完了。搭档还剩2张，对手还剩1张。你手里有炸弹和散牌。你该怎么做？',opts:[{t:'出散牌让搭档接',c:0,why:'❌ 对手只剩1张，出散牌可能直接让对手赢。'},{t:'用炸弹炸掉后出小牌，帮搭档走完',c:1,why:'✅ 残局中炸弹的使命就是帮搭档出完，避免双下。'}]},
+
+{q:'开局第一手，你手里有4张5炸弹+对A+对K+散牌若干。你先出什么？',opts:[{t:'先出炸弹炸场',c:0,why:'❌ 开局就丢炸弹太浪费，炸弹应留给关键时刻。'},{t:'先出对A或对K试探',c:1,why:'✅ 先用大对子试探对手实力，炸弹留到残局。'}]},
+{q:'对手只剩2张牌，可能是一对。你手里有4张9炸弹+单张A+单张K。你怎么打？',opts:[{t:'出单张A',c:1,why:'✅ 单张A对手可能管不住，逼他拆对就赢了。'},{t:'直接炸弹',c:0,why:'❌ 对手只有2张，炸弹打2张牌太浪费。'}]},
+{q:'对手出了一手4张10的炸弹，你是下一个。你有4张Q炸弹。你炸不炸？',opts:[{t:'炸掉对手的炸弹',c:0,why:'❌ 除非能确保后续能出完，否则不要随便互炸。'},{t:'不炸，等更好的时机',c:1,why:'✅ 盲目互炸消耗资源，留炸弹到残局更有价值。'}]},
+{q:'对手出了一手同花顺，你有4张A炸弹。对手场上还有10+张牌。你炸吗？',opts:[{t:'炸掉同花顺',c:0,why:'❌ 对手还有10+张牌，炸完你出不完也没意义。'},{t:'不炸，等对手牌少时再炸',c:1,why:'✅ 炸弹用在对手即将出完时才有致命效果。'}]},
+{q:'搭档出了一个炸弹，对手用更大的炸弹管了。你手里还有炸弹。你该炸吗？',opts:[{t:'再炸一层帮搭档夺回牌权',c:1,why:'✅ 关键时刻接力炸弹，帮搭档出完是核心策略。'},{t:'不炸等自己用',c:0,why:'❌ 搭档被压你不帮，可能导致搭档跑不掉。'}]},
+{q:'中局阶段，你有4张J炸弹+同花顺♠6-10。对手出了一对A。你怎么打？',opts:[{t:'用炸弹管对A',c:0,why:'❌ 炸弹和同花顺都是大杀器，不值得炸一对A。'},{t:'不管对A，留炸弹和同花顺',c:1,why:'✅ 这两种大牌型留到残局使用价值最大化。'}]},
+{q:'你手里有5张炸弹（4张Q+逢人配）和一些散牌。对手出单张2，你管吗？',opts:[{t:'用炸弹管单张2',c:0,why:'❌ 5张超级炸弹管单张2？代价太大。'},{t:'不管，忍一手',c:1,why:'✅ 5张炸弹是终极大招，只为关键时刻准备。'}]},
+{q:'下家（对手）还剩3张牌，可能是三同张或三带一对。你有4张7炸弹。你该怎么做？',opts:[{t:'等对手出牌后再决定是否炸',c:1,why:'✅ 看清对手牌型再炸，精准打击。'},{t:'主动出炸弹抢先手',c:0,why:'❌ 主动炸完你不一定能清完手牌，不如等对手露出牌型。'}]},
+
+{q:'开局先手出牌，你手里有顺子5-6-7-8-9、对A、单张K、若干小牌。你先出什么？',opts:[{t:'先出顺子',c:1,why:'✅ 长牌型先出，减少手牌数量，后续更容易管理。'},{t:'先出对A',c:0,why:'❌ 对A留着收尾更好，长顺子先走效率更高。'}]},
+{q:'你手里有同花顺♠7-8-9-10-J和对A+散牌。先出哪个？',opts:[{t:'先出同花顺',c:0,why:'❌ 同花顺是强力牌型，留着关键时刻一锤定音更好。'},{t:'先出对A和散牌',c:1,why:'✅ 先清理小牌，同花顺留作最后收割。'}]},
+{q:'先手出牌，你有对3、对5、对7、对9、对K、对A。怎么规划出牌顺序？',opts:[{t:'从小对子开始依次出：对3→对5→对7...',c:1,why:'✅ 从小到大依次出，大对子留着收牌权。'},{t:'先出对A抢牌权',c:0,why:'❌ 对A太早出掉，后面被对手对子欺负。'}]},
+{q:'你手里有三带二（三个8带对3）和散牌A、K、Q。先出什么？',opts:[{t:'先出三带二',c:1,why:'✅ 三带二一次出5张，效率高且减少手牌。'},{t:'先出单张A',c:0,why:'❌ 单张A留着管对手的单张更灵活。'}]},
+{q:'先手出牌，你有顺子3-4-5-6-7和4张K炸弹。怎么出？',opts:[{t:'先出顺子清小牌',c:1,why:'✅ 顺子减少5张手牌，炸弹留着控制局面。'},{t:'先出炸弹威慑',c:0,why:'❌ 开局炸炸弹毫无意义，浪费最大的威慑力。'}]},
+{q:'你手里剩6张牌：对A、对K、对Q。你是先手。怎么出？',opts:[{t:'从对Q开始依次出',c:1,why:'✅ 从小到大，对A最后出收尾最有保障。'},{t:'先出对A抢牌权',c:0,why:'❌ 对A先出后面就被动了，留着压场。'}]},
+{q:'先手出牌，你有连对33-44-55和单张A、K。先出什么？',opts:[{t:'先出连对',c:1,why:'✅ 连对一次出6张效率高，散牌留着管对手。'},{t:'先出单张A',c:0,why:'❌ A留着更灵活，连对先走手牌更清爽。'}]},
+{q:'你的手牌很散：单张2、A、K、Q、J、10、9，没有组合。先出什么？',opts:[{t:'从最小的单张9开始出',c:1,why:'✅ 散牌多时从最小出起，大牌留着管对手。'},{t:'先出单张2',c:0,why:'❌ 2是最大的单张，先出等于主动放弃控制权。'}]},
+
+{q:'残局阶段，你vs对手1v1。你剩3张：单A、对K。对手先出单张5。你管吗？',opts:[{t:'出A管5',c:1,why:'✅ 管住后出对K一次出完，直接获胜。'},{t:'不管等对手出',c:0,why:'❌ 不管对手可能拆对出完，你该主动出击。'}]},
+{q:'残局，对手只剩1张牌。你手里有对8和单张K。你先手出什么？',opts:[{t:'出单张K',c:1,why:'✅ 出大单张逼对手，然后对8出完。'},{t:'出对8',c:0,why:'❌ 对8出完留K单出，对手可能有A管你。先出K更稳妥。'}]},
+{q:'残局对手只剩1张，你是先手。你剩对A和单张3。怎么出？',opts:[{t:'出对A',c:0,why:'❌ 对手只有1张，出对A后你剩3还要被管。'},{t:'出单张3',c:1,why:'✅ 出小单张，对手出什么都用A管，然后对A出完。'}]},
+{q:'你和搭档都快出完了。你剩2张：单A和单K。搭档出单张7，对手不管。该你接吗？',opts:[{t:'出K接搭档的牌',c:1,why:'✅ 接住后你剩A单出，有机会先走。'},{t:'不接，自己出A',c:0,why:'❌ 不接浪费牌权，搭档可能也想让你先走。'}]},
+{q:'残局1v1，你先手剩4张：对A、对K。对手也剩4张。你先出什么？',opts:[{t:'先出对K',c:1,why:'✅ 试对手有没有更大的对子，对A留着收尾。'},{t:'先出对A',c:0,why:'❌ 对A是最大的对子，先出等于放弃最后保障。'}]},
+{q:'对手剩5张牌，可能是一手顺子。你有4张10炸弹和单张A。你怎么打？',opts:[{t:'出单张A试探对手',c:1,why:'✅ 先试探对手手牌结构，再决定是否用炸弹。'},{t:'直接出炸弹',c:0,why:'❌ 还不知道对手什么牌型就炸太盲目。'}]},
+{q:'残局，你是最后出牌的人。搭档剩2张（一对），对手出单张Q。你手里有单张K和单张A。你怎么打？',opts:[{t:'出K管Q',c:1,why:'✅ 管住后出A，搭档不用出就赢了。但如果管不住就让搭档的对接。'},{t:'不管，让搭档的对接对手的牌',c:0,why:'❌ 对手出单张你不管，下轮可能出对子卡住搭档。'}]},
+{q:'残局对手只剩2张牌（可能是对子），你先手剩5张：三带二（三个J带对5）。你怎么出？',opts:[{t:'出三带二，一次出完5张',c:1,why:'✅ 5张一次出完直接胜利，对手无法阻挡。'},{t:'分开出：先出对5再出三张J',c:0,why:'❌ 分开出给对手机会，一次出完才最稳。'}]}
+];
+
+
+let decIdx = 0;
+function decNew() {
+  const s = SCENARIOS[decIdx % SCENARIOS.length];
+  decIdx++;
+  document.getElementById('decS').textContent = s.q;
+  document.getElementById('decH').innerHTML = '';
+  document.getElementById('decP').innerHTML = '';
+  const o = document.getElementById('decO'); o.innerHTML = '';
+  s.opts.forEach(opt => {
+    const div = document.createElement('div'); div.className = 'opt'; div.textContent = opt.t;
+    div.onclick = () => {
+      const fb = document.getElementById('decFb');
+      if (opt.c) { fb.className='fb ok'; stats.ok++; }
+      else { fb.className='fb no'; stats.no++; }
+      fb.innerHTML = opt.why; fb.style.display = 'block';
+      o.querySelectorAll('.opt').forEach((el,i) => {
+        el.classList.add('dis');
+        if (s.opts[i].c) el.classList.add('ok');
+      });
+      updateStats();
+    };
+    o.appendChild(div);
+  });
+  document.getElementById('decFb').style.display = 'none';
+}
+
+// ========== 理牌训练 ==========
+let sortState = {hand:[],groups:[],selected:[],optimal:0};
+
+function sortNew() {
+  const game = initGame();
+  const hand = game.hands[0];
+  const optimal = decomposeHand(hand);
+  sortState = {hand:[...hand],groups:[],selected:[],optimal:optimal.length};
+  document.getElementById('sortInfo').textContent = `27张 · 级牌${TRUMP_RANK} · ♥${TRUMP_RANK}逢人配`;
+  renderSortHand();
+  renderSortGroups();
+  document.getElementById('sortFb').style.display = 'none';
+  document.getElementById('sortScore').style.display = 'none';
+}
+
+function renderSortHand() {
+  const c = document.getElementById('sortHand'); c.innerHTML = '';
+  sortState.hand.sort((a,b) => b.power - a.power);
+  sortState.hand.forEach(card => {
+    const el = createCardEl(card);
+    if (sortState.selected.find(x => x.id === card.id)) el.classList.add('sel');
+    el.onclick = () => {
+      const idx = sortState.selected.findIndex(x => x.id === card.id);
+      if (idx >= 0) sortState.selected.splice(idx, 1);
+      else sortState.selected.push(card);
+      renderSortHand();
+    };
+    c.appendChild(el);
+  });
+}
+
+function renderSortGroups() {
+  const container = document.getElementById('sortGroups'); container.innerHTML = '';
+  sortState.groups.forEach((g, idx) => {
+    const div = document.createElement('div'); div.className = 'grp';
+    const tl = typeLabel(g.type);
+    div.innerHTML = `<b>${tl}</b>: ${g.cards.map(c=>c.rank+(c.suit||'')).join('')}`;
+    div.onclick = () => {
+      g.cards.forEach(c => sortState.hand.push(c));
+      sortState.groups.splice(idx, 1);
+      sortState.hand.sort((a,b) => b.power - a.power);
+      renderSortHand();
+      renderSortGroups();
+    };
+    container.appendChild(div);
+  });
+}
+
+function addSelectedGroup() {
+  if (sortState.selected.length === 0) { alert('请先选牌！'); return; }
+  const dt = detectType([...sortState.selected]);
+  if (!dt) { alert('❌ 这不是合法的牌型！'); return; }
+  sortState.groups.push({type:dt.type, cards:[...sortState.selected]});
+  const ids = new Set(sortState.selected.map(c => c.id));
+  sortState.hand = sortState.hand.filter(c => !ids.has(c.id));
+  sortState.selected = [];
+  renderSortHand();
+  renderSortGroups();
+}
+
+function clearGroups() {
+  sortState.groups.forEach(g => sortState.hand.push(...g.cards));
+  sortState.groups = [];
+  sortState.selected = [];
+  sortState.hand.sort((a,b) => b.power - a.power);
+  renderSortHand();
+  renderSortGroups();
+}
+
+function sortSubmit() {
+  const totalCards = sortState.groups.reduce((s,g) => s + g.cards.length, 0);
+  if (totalCards !== 27) { alert(`❌ 只用了${totalCards}张牌，必须用完27张！`); return; }
+  for (const g of sortState.groups) {
+    const dt = detectType(g.cards);
+    if (!dt) { alert(`❌ 牌组"${g.cards.map(c=>c.rank).join(',')}"不合法！`); return; }
+  }
+  const result = evaluateSorting(sortState.groups, sortState.optimal);
+  const fb = document.getElementById('sortFb');
+  const scoreBox = document.getElementById('sortScore');
+  if (!result.valid) { fb.className='fb no'; fb.innerHTML=result.error; fb.style.display='block'; scoreBox.style.display='none'; return; }
+  fb.style.display = 'none';
+  scoreBox.style.display = 'block';
+  document.getElementById('sortGrade').textContent = result.grade;
+  document.getElementById('sortGrade').style.color = result.color;
+  document.getElementById('sortDetail').innerHTML = `${result.message}<br>最优：${result.optimal}手 | 你的：${result.userCount}手 | 差距：+${result.diff} | ${result.bombs}炸 ${result.singles}单`;
+}
+
+// ============= Tribute Training Module (prefix: trib) =============
+// Card format: {id, suit:'♥'|'♦'|'♣'|'♠'|'', rank:'3'|...|'2'|'小王'|'大王', isJoker:bool, isWild:bool, power:number}
+
+var tribScore = { correct: 0, wrong: 0, streak: 0 };
+var tribState = null; // current quiz state
+
+var TRIB_RANKS = ['3','4','5','6','7','8','9','10','J','Q','K','A','2'];
+var TRIB_SUITS = ['♠','♥','♣','♦'];
+var TRIB_RANK_POWER = {};
+(function(){
+  for(var i=0;i<TRIB_RANKS.length;i++) TRIB_RANK_POWER[TRIB_RANKS[i]]=i;
+  TRIB_RANK_POWER['小王']=13;
+  TRIB_RANK_POWER['大王']=14;
+})();
+
+function tribRankPower(rank){
+  return TRIB_RANK_POWER[rank] !== undefined ? TRIB_RANK_POWER[rank] : -1;
+}
+
+function tribCardStr(c){
+  if(c.isJoker) return c.rank;
+  return c.suit + c.rank;
+}
+
+// Get the big card rank for tribute (excluding ♥级牌)
+function tribGetBiggestRank(cards, trumpRank){
+  var filtered = cards.filter(function(c){
+    return !(c.suit==='♥' && c.rank===trumpRank && !c.isJoker);
+  });
+  if(filtered.length===0) return -1;
+  var best = filtered[0];
+  for(var i=1;i<filtered.length;i++){
+    if(tribRankPower(filtered[i].rank) > tribRankPower(best.rank)) best = filtered[i];
+  }
+  return tribRankPower(best.rank);
+}
+
+function tribFindCardByRankPower(cards, power, trumpRank){
+  var filtered = cards.filter(function(c){
+    if(c.suit==='♥' && c.rank===trumpRank) return false;
+    return tribRankPower(c.rank) === power;
+  });
+  return filtered.length > 0 ? filtered[0] : null;
+}
+
+function tribCountBigJokers(cards){
+  return cards.filter(function(c){ return c.rank==='大王'; }).length;
+}
+
+// Check if a card is valid for return tribute (还贡): rank ≤ 10, not joker, not 级牌
+function tribIsValidReturn(card, trumpRank){
+  if(card.isJoker) return false;
+  if(card.rank === trumpRank) return false;
+  var p = tribRankPower(card.rank);
+  var maxP = TRIB_RANK_POWER['10']; // power of '10'
+  if(trumpRank === '10') maxP = TRIB_RANK_POWER['9'];
+  return p <= maxP;
+}
+
+function tribFindReturnCard(cards, trumpRank){
+  // Pick the largest valid return card
+  var valid = cards.filter(function(c){ return tribIsValidReturn(c, trumpRank); });
+  if(valid.length===0) return null;
+  var best = valid[0];
+  for(var i=1;i<valid.length;i++){
+    if(tribRankPower(valid[i].rank) > tribRankPower(best.rank)) best = valid[i];
+  }
+  return best;
+}
+
+// ============= Card Generation =============
+var tribCardId = 0;
+function tribGenerateCards(count, opts){
+  opts = opts || {};
+  var excludeWild = opts.excludeWild || false;
+  var trumpRank = opts.trumpRank || '2';
+  var pool = [];
+  for(var s=0;s<TRIB_SUITS.length;s++){
+    for(var r=0;r<TRIB_RANKS.length;r++){
+      var rank = TRIB_RANKS[r];
+      var isWild = (TRIB_SUITS[s]==='♥' && rank===trumpRank);
+      if(excludeWild && isWild) continue;
+      pool.push({
+        id: 'tc'+(tribCardId++),
+        suit: TRIB_SUITS[s],
+        rank: rank,
+        isJoker: false,
+        isWild: isWild,
+        power: tribRankPower(rank)
+      });
+    }
+  }
+  // Add jokers
+  pool.push({id:'tc'+(tribCardId++), suit:'', rank:'小王', isJoker:true, isWild:false, power:13});
+  pool.push({id:'tc'+(tribCardId++), suit:'', rank:'大王', isJoker:true, isWild:false, power:14});
+  // Shuffle
+  for(var i=pool.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=pool[i]; pool[i]=pool[j]; pool[j]=t;
+  }
+  return pool.slice(0, count);
+}
+
+// Generate a hand that guarantees certain cards (e.g. 2 big jokers for resist)
+function tribGenerateHand(count, trumpRank, mustHave){
+  mustHave = mustHave || [];
+  var pool = [];
+  for(var s=0;s<TRIB_SUITS.length;s++){
+    for(var r=0;r<TRIB_RANKS.length;r++){
+      var rank = TRIB_RANKS[r];
+      var isWild = (TRIB_SUITS[s]==='♥' && rank===trumpRank);
+      pool.push({
+        id:'tc'+(tribCardId++), suit:TRIB_SUITS[s], rank:rank,
+        isJoker:false, isWild:isWild, power:tribRankPower(rank)
+      });
+    }
+  }
+  pool.push({id:'tc'+(tribCardId++), suit:'', rank:'小王', isJoker:true, isWild:false, power:13});
+  pool.push({id:'tc'+(tribCardId++), suit:'', rank:'大王', isJoker:true, isWild:false, power:14});
+
+  var hand = [];
+  var usedIds = {};
+  // Place mustHave cards first
+  for(var m=0;m<mustHave.length;m++){
+    var need = mustHave[m]; // {rank, suit?}
+    for(var p=0;p<pool.length;p++){
+      if(usedIds[pool[p].id]) continue;
+      var match = true;
+      if(need.rank && pool[p].rank!==need.rank) match=false;
+      if(need.suit && pool[p].suit!==need.suit) match=false;
+      if(match){
+        hand.push(pool[p]);
+        usedIds[pool[p].id]=true;
+        break;
+      }
+    }
+  }
+  // Fill remaining
+  var remain = pool.filter(function(c){ return !usedIds[c.id]; });
+  for(var i=remain.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=remain[i]; remain[i]=remain[j]; remain[j]=t;
+  }
+  while(hand.length<count && remain.length>0){
+    hand.push(remain.pop());
+  }
+  // Sort by power
+  hand.sort(function(a,b){ return a.power - b.power; });
+  return hand;
+}
+
+// ============= Scenario Generation =============
+function tribNew(){
+  tribCardId = 0;
+  var fb = document.getElementById('tribFb');
+  if(fb) fb.innerHTML = '';
+  var nextBtn = document.getElementById('tribNextBtn');
+  if(nextBtn) nextBtn.style.display = 'none';
+
+  // Pick random trump rank (not jokers)
+  var trumpIdx = Math.floor(Math.random() * TRIB_RANKS.length);
+  var trumpRank = TRIB_RANKS[trumpIdx];
+
+  // Generate scenario type
+  // 0=single tribute, 1=single resist, 2=double same, 3=double diff, 4=double resist
+  var scenarioType = Math.floor(Math.random() * 5);
+
+  var players = [
+    { pos:'东', rank:1, hand:[], isWinner:true },
+    { pos:'南', rank:2, hand:[], isWinner:true },
+    { pos:'西', rank:3, hand:[], isWinner:false },
+    { pos:'北', rank:4, hand:[], isWinner:false }
+  ];
+
+  // Shuffle positions
+  for(var i=players.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=players[i]; players[i]=players[j]; players[j]=t;
+  }
+
+  // Assign hands based on scenario
+  var answer = {};
+
+  if(scenarioType === 0){
+    // 单下进贡
+    var loser = players[3]; // 4th place
+    var winner1 = players[0]; // 1st place
+    loser.hand = tribGenerateHand(13, trumpRank);
+    winner1.hand = tribGenerateHand(13, trumpRank);
+    players[1].hand = tribGenerateHand(13, trumpRank);
+    players[2].hand = tribGenerateHand(13, trumpRank);
+
+    var biggestPower = tribGetBiggestRank(loser.hand, trumpRank);
+    var tributeCard = tribFindCardByRankPower(loser.hand, biggestPower, trumpRank);
+
+    answer = {
+      type: '单下进贡',
+      tributeGiver: loser.pos,
+      tributeCard: tributeCard,
+      tributeReceiver: winner1.pos,
+      returnGiver: winner1.pos,
+      returnCard: null, // will find below
+      returnReceiver: loser.pos,
+      firstPlayer: loser.pos,
+      description: loser.pos+'进贡'+tribCardStr(tributeCard)+'给'+winner1.pos
+    };
+    answer.returnCard = tribFindReturnCard(winner1.hand, trumpRank);
+
+  } else if(scenarioType === 1){
+    // 单下抗贡
+    var loser = players[3];
+    var winner1 = players[0];
+    loser.hand = tribGenerateHand(13, trumpRank, [{rank:'大王'},{rank:'大王'}]);
+    winner1.hand = tribGenerateHand(13, trumpRank);
+    players[1].hand = tribGenerateHand(13, trumpRank);
+    players[2].hand = tribGenerateHand(13, trumpRank);
+
+    answer = {
+      type: '单下抗贡',
+      tributeGiver: null,
+      tributeCard: null,
+      tributeReceiver: null,
+      returnGiver: null,
+      returnCard: null,
+      returnReceiver: null,
+      firstPlayer: winner1.pos,
+      description: loser.pos+'持有2张大王，抗贡！上游'+winner1.pos+'先出'
+    };
+
+  } else if(scenarioType === 2){
+    // 双下同大
+    var loser3 = players[2]; // 3rd
+    var loser4 = players[3]; // 4th
+    var winner1 = players[0]; // 1st
+    var winner2 = players[1]; // 2nd
+
+    // Give both losers the same biggest rank (e.g. both have an A as biggest)
+    var targetRankIdx = Math.floor(Math.random()*8)+4; // range: 7 to A area
+    var targetRank = TRIB_RANKS[Math.min(targetRankIdx, TRIB_RANKS.length-1)];
+    loser3.hand = tribGenerateHand(13, trumpRank, [{rank:targetRank}]);
+    loser4.hand = tribGenerateHand(13, trumpRank, [{rank:targetRank}]);
+    // Ensure no bigger card exists (by making it the biggest possible in that hand)
+    winner1.hand = tribGenerateHand(13, trumpRank);
+    winner2.hand = tribGenerateHand(13, trumpRank);
+
+    var card3 = tribFindCardByRankPower(loser3.hand, tribRankPower(targetRank), trumpRank);
+    var card4 = tribFindCardByRankPower(loser4.hand, tribRankPower(targetRank), trumpRank);
+
+    answer = {
+      type: '双下同大',
+      tributeGiver3: loser3.pos,
+      tributeCard3: card3,
+      tributeGiver4: loser4.pos,
+      tributeCard4: card4,
+      tributeReceiver3: winner1.pos,
+      tributeReceiver4: winner2.pos,
+      returnGiver3: winner1.pos,
+      returnCard3: tribFindReturnCard(winner1.hand, trumpRank),
+      returnReceiver3: loser3.pos,
+      returnGiver4: winner2.pos,
+      returnCard4: tribFindReturnCard(winner2.hand, trumpRank),
+      returnReceiver4: loser4.pos,
+      firstPlayer: winner2.pos,
+      description: '双下同大：'+loser3.pos+'→'+winner1.pos+'，'+loser4.pos+'→'+winner2.pos+'；'+winner2.pos+'先出'
+    };
+
+  } else if(scenarioType === 3){
+    // 双下不同大
+    var loser3 = players[2];
+    var loser4 = players[3];
+    var winner1 = players[0];
+    var winner2 = players[1];
+
+    // Give different biggest ranks
+    var highIdx = Math.floor(Math.random()*5)+8; // Q to A area
+    var lowIdx = Math.floor(Math.random()*5)+3; // 6 to 10 area
+    var highRank = TRIB_RANKS[Math.min(highIdx, TRIB_RANKS.length-1)];
+    var lowRank = TRIB_RANKS[Math.min(lowIdx, TRIB_RANKS.length-1)];
+    if(tribRankPower(highRank) <= tribRankPower(lowRank)){
+      var tmp=highRank; highRank=lowRank; lowRank=tmp;
+    }
+    // Randomly assign which loser gets the bigger card
+    var biggerLoser, smallerLoser;
+    if(Math.random()<0.5){ biggerLoser=loser3; smallerLoser=loser4; }
+    else { biggerLoser=loser4; smallerLoser=loser3; }
+
+    biggerLoser.hand = tribGenerateHand(13, trumpRank, [{rank:highRank}]);
+    smallerLoser.hand = tribGenerateHand(13, trumpRank, [{rank:lowRank}]);
+    winner1.hand = tribGenerateHand(13, trumpRank);
+    winner2.hand = tribGenerateHand(13, trumpRank);
+
+    var cardBig = tribFindCardByRankPower(biggerLoser.hand, tribRankPower(highRank), trumpRank);
+    var cardSmall = tribFindCardByRankPower(smallerLoser.hand, tribRankPower(lowRank), trumpRank);
+
+    answer = {
+      type: '双下不同大',
+      tributeGiverBig: biggerLoser.pos,
+      tributeCardBig: cardBig,
+      tributeGiverSmall: smallerLoser.pos,
+      tributeCardSmall: cardSmall,
+      tributeReceiverBig: winner1.pos,
+      tributeReceiverSmall: winner2.pos,
+      returnGiverBig: winner1.pos,
+      returnCardBig: tribFindReturnCard(winner1.hand, trumpRank),
+      returnReceiverBig: biggerLoser.pos,
+      returnGiverSmall: winner2.pos,
+      returnCardSmall: tribFindReturnCard(winner2.hand, trumpRank),
+      returnReceiverSmall: smallerLoser.pos,
+      firstPlayer: biggerLoser.pos,
+      description: '双下不同大：'+biggerLoser.pos+'进贡大牌给'+winner1.pos+'，'+smallerLoser.pos+'进贡小牌给'+winner2.pos+'；'+biggerLoser.pos+'先出'
+    };
+
+  } else {
+    // 双下抗贡
+    var loser3 = players[2];
+    var loser4 = players[3];
+    var winner1 = players[0];
+    var winner2 = players[1];
+
+    // Combined big jokers >= 2
+    var split = Math.random()<0.5 ? [2,0] : (Math.random()<0.5 ? [1,1] : [0,2]);
+    loser3.hand = tribGenerateHand(13, trumpRank, split[0]>0 ? [{rank:'大王'}].concat(split[0]>1?[{rank:'大王'}]:[]) : []);
+    loser4.hand = tribGenerateHand(13, trumpRank, split[1]>0 ? [{rank:'大王'}].concat(split[1]>1?[{rank:'大王'}]:[]) : []);
+    // Ensure we actually got the jokers — force if needed
+    if(split[0]>=2){ loser3.hand = tribGenerateHand(13, trumpRank, [{rank:'大王'},{rank:'大王'}]); }
+    if(split[1]>=2){ loser4.hand = tribGenerateHand(13, trumpRank, [{rank:'大王'},{rank:'大王'}]); }
+    if(split[0]===1 && split[1]===1){
+      loser3.hand = tribGenerateHand(13, trumpRank, [{rank:'大王'}]);
+      loser4.hand = tribGenerateHand(13, trumpRank, [{rank:'大王'}]);
+    }
+    winner1.hand = tribGenerateHand(13, trumpRank);
+    winner2.hand = tribGenerateHand(13, trumpRank);
+
+    answer = {
+      type: '双下抗贡',
+      tributeGiver: null,
+      tributeCard: null,
+      tributeReceiver: null,
+      returnGiver: null,
+      returnCard: null,
+      returnReceiver: null,
+      firstPlayer: winner1.pos,
+      description: '双下抗贡：输方合计持有≥2张大王，免进贡；上游'+winner1.pos+'先出'
+    };
+  }
+
+  // Store state
+  tribState = {
+    trumpRank: trumpRank,
+    players: players,
+    answer: answer,
+    scenarioType: scenarioType,
+    options: null
+  };
+
+  // Build display
+  tribRenderScenario(players, trumpRank);
+  tribBuildOptions(answer, players, trumpRank);
+}
+
+// ============= Rendering =============
+function tribRenderScenario(players, trumpRank){
+  var desc = document.getElementById('tribDesc');
+  if(desc){
+    desc.innerHTML = '<div class="trib-trump">级牌: <b>'+trumpRank+'</b> (♥'+trumpRank+'为逢人配)</div>' +
+      '<div class="trib-result">上局排名：</div>';
+  }
+
+  var container = document.getElementById('tribPlayers');
+  if(!container) return;
+  container.innerHTML = '';
+
+  var rankNames = ['🥇上游','🥈二游','🥉三游','💀下游'];
+  for(var i=0;i<4;i++){
+    var p = players[i];
+    var div = document.createElement('div');
+    div.className = 'trib-player-card';
+
+    var header = document.createElement('div');
+    header.className = 'trib-player-header';
+    header.innerHTML = '<span class="trib-pos">'+p.pos+'</span> <span class="trib-rank">'+rankNames[p.rank-1]+'</span>';
+    div.appendChild(header);
+
+    var handDiv = document.createElement('div');
+    handDiv.className = 'trib-hand';
+    for(var c=0;c<p.hand.length;c++){
+      var card = p.hand[c];
+      var el = document.createElement('span');
+      el.className = 'trib-card';
+      if(card.isJoker){
+        el.className += card.rank==='大王' ? ' trib-card-joker-big' : ' trib-card-joker-small';
+        el.textContent = card.rank;
+      } else {
+        var isRed = (card.suit==='♥' || card.suit==='♦');
+        if(isRed) el.className += ' trib-card-red';
+        // Highlight 逢人配
+        if(card.suit==='♥' && card.rank===trumpRank){
+          el.className += ' trib-card-wild';
+        }
+        // Highlight big cards (A, 2, jokers)
+        if(tribRankPower(card.rank) >= tribRankPower('A')){
+          el.className += ' trib-card-high';
+        }
+        el.textContent = card.suit + card.rank;
+      }
+      handDiv.appendChild(el);
+    }
+    div.appendChild(handDiv);
+    container.appendChild(div);
+  }
+
+  // Update result display in desc
+  var resultDiv = desc.querySelector('.trib-result');
+  if(resultDiv){
+    var sorted = players.slice().sort(function(a,b){ return a.rank-b.rank; });
+    resultDiv.textContent = '上局排名：' + sorted.map(function(p){
+      return rankNames[p.rank-1]+p.pos;
+    }).join(' → ');
+  }
+}
+
+function tribBuildOptions(answer, players, trumpRank){
+  var optContainer = document.getElementById('tribO');
+  if(!optContainer) return;
+  optContainer.innerHTML = '';
+
+  // Generate 4 options (1 correct, 3 wrong)
+  var correctText = tribFormatAnswer(answer);
+  var options = [correctText];
+
+  // Generate wrong options
+  var wrongPool = tribGenerateWrongOptions(answer, players, trumpRank);
+  while(options.length < 4 && wrongPool.length > 0){
+    var w = wrongPool.splice(Math.floor(Math.random()*wrongPool.length), 1)[0];
+    if(options.indexOf(w) === -1) options.push(w);
+  }
+  // Pad if needed
+  while(options.length < 4){
+    options.push('以上都不对 (无法判断)');
+  }
+
+  // Shuffle
+  for(var i=options.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=options[i]; options[i]=options[j]; options[j]=t;
+  }
+
+  tribState.options = options;
+  var correctIdx = options.indexOf(correctText);
+  tribState.correctIdx = correctIdx;
+
+  for(var k=0;k<options.length;k++){
+    var btn = document.createElement('button');
+    btn.className = 'btn btn-option';
+    btn.textContent = options[k];
+    btn.setAttribute('data-idx', k);
+    btn.onclick = function(){ tribCheck(parseInt(this.getAttribute('data-idx'))); };
+    optContainer.appendChild(btn);
+  }
+}
+
+function tribFormatAnswer(answer){
+  if(answer.type === '单下抗贡'){
+    return '抗贡！不进贡，'+answer.firstPlayer+'先出';
+  }
+  if(answer.type === '双下抗贡'){
+    return '双下抗贡！不进贡，'+answer.firstPlayer+'先出';
+  }
+  if(answer.type === '单下进贡'){
+    return answer.tributeGiver+'进贡'+tribCardStr(answer.tributeCard)+'给'+answer.tributeReceiver+
+      '，'+answer.tributeReceiver+'还贡'+(answer.returnCard?tribCardStr(answer.returnCard):'?')+'给'+answer.returnGiver+
+      '，'+answer.firstPlayer+'先出';
+  }
+  if(answer.type === '双下同大'){
+    return answer.tributeGiver3+'进'+tribCardStr(answer.tributeCard3)+'→'+answer.tributeReceiver3+
+      '，'+answer.tributeGiver4+'进'+tribCardStr(answer.tributeCard4)+'→'+answer.tributeReceiver4+
+      ' (同大)，'+answer.firstPlayer+'先出';
+  }
+  if(answer.type === '双下不同大'){
+    return answer.tributeGiverBig+'进'+tribCardStr(answer.tributeCardBig)+'→'+answer.tributeReceiverBig+
+      '，'+answer.tributeGiverSmall+'进'+tribCardStr(answer.tributeCardSmall)+'→'+answer.tributeReceiverSmall+
+      ' (不同大)，'+answer.firstPlayer+'先出';
+  }
+  return '未知';
+}
+
+function tribGenerateWrongOptions(answer, players, trumpRank){
+  var wrongs = [];
+  var positions = players.map(function(p){ return p.pos; });
+
+  if(answer.type === '单下进贡'){
+    // Wrong: wrong giver
+    var others = positions.filter(function(p){ return p!==answer.tributeGiver && p!==answer.tributeReceiver; });
+    if(others.length>0){
+      wrongs.push(others[0]+'进贡'+tribCardStr(answer.tributeCard)+'给'+answer.tributeReceiver+'，'+answer.tributeReceiver+'还贡给'+others[0]+'，'+others[0]+'先出');
+    }
+    // Wrong: wrong direction
+    wrongs.push(answer.tributeGiver+'进贡'+tribCardStr(answer.tributeCard)+'给'+others[0]+'，还贡给'+answer.tributeGiver+'，'+others[0]+'先出');
+    // Wrong: wrong first player
+    var fp = positions.filter(function(p){ return p!==answer.firstPlayer; });
+    wrongs.push(answer.tributeGiver+'进贡'+tribCardStr(answer.tributeCard)+'给'+answer.tributeReceiver+'，还贡给'+answer.tributeGiver+'，'+fp[0]+'先出');
+    // Wrong: interpret as double-low
+    wrongs.push('双下进贡，'+answer.tributeGiver+'和'+others[0]+'分别进贡，'+fp[1]||fp[0]+'先出');
+  } else if(answer.type === '单下抗贡'){
+    var loser = players[3].pos;
+    var w1 = players[0].pos;
+    wrongs.push(loser+'进贡大牌给'+w1+'，还贡给'+loser+'，'+loser+'先出');
+    wrongs.push('双下抗贡，不进贡，'+w1+'先出');
+    wrongs.push(loser+'进贡大牌给'+w1+'，还贡给'+loser+'，'+w1+'先出');
+  } else if(answer.type === '双下同大'){
+    var fp = positions.filter(function(p){ return p!==answer.firstPlayer; });
+    wrongs.push(answer.tributeGiver3+'→'+answer.tributeReceiver3+'，'+answer.tributeGiver4+'→'+answer.tributeReceiver4+' (同大)，'+fp[0]+'先出');
+    wrongs.push(answer.tributeGiver4+'→'+answer.tributeReceiver3+'，'+answer.tributeGiver3+'→'+answer.tributeReceiver4+' (同大)，'+answer.firstPlayer+'先出');
+    wrongs.push('抗贡！不进贡，'+answer.tributeReceiver3+'先出');
+  } else if(answer.type === '双下不同大'){
+    // Swap big/small
+    wrongs.push(answer.tributeGiverSmall+'进'+tribCardStr(answer.tributeCardBig)+'→'+answer.tributeReceiverBig+
+      '，'+answer.tributeGiverBig+'进'+tribCardStr(answer.tributeCardSmall)+'→'+answer.tributeReceiverSmall+
+      ' (不同大)，'+answer.tributeGiverSmall+'先出');
+    // Same as double-same interpretation
+    wrongs.push(answer.tributeGiverBig+'→'+answer.tributeReceiverBig+'，'+answer.tributeGiverSmall+'→'+answer.tributeReceiverSmall+
+      ' (同大)，'+answer.tributeReceiverBig+'先出');
+    // Resist
+    wrongs.push('抗贡！不进贡，'+answer.tributeReceiverBig+'先出');
+    // Wrong first player
+    wrongs.push(answer.tributeGiverBig+'进'+tribCardStr(answer.tributeCardBig)+'→'+answer.tributeReceiverBig+
+      '，'+answer.tributeGiverSmall+'进'+tribCardStr(answer.tributeCardSmall)+'→'+answer.tributeReceiverSmall+
+      ' (不同大)，'+answer.tributeGiverSmall+'先出');
+  } else if(answer.type === '双下抗贡'){
+    var loser3 = players[2].pos;
+    var loser4 = players[3].pos;
+    var w1 = players[0].pos;
+    wrongs.push(loser3+'→'+w1+'，'+loser4+'→'+players[1].pos+' (同大)，'+players[1].pos+'先出');
+    wrongs.push(loser3+'→'+w1+'，'+loser4+'→'+players[1].pos+' (不同大)，'+loser3+'先出');
+    wrongs.push('单下抗贡，不进贡，'+loser4+'先出');
+  }
+  return wrongs;
+}
+
+// ============= Check Answer =============
+function tribCheck(selectedIdx){
+  if(!tribState) return;
+
+  var optContainer = document.getElementById('tribO');
+  var fb = document.getElementById('tribFb');
+  var btns = optContainer.querySelectorAll('.btn-option');
+  var correctIdx = tribState.correctIdx;
+
+  // Disable all buttons
+  for(var i=0;i<btns.length;i++){
+    btns[i].disabled = true;
+    btns[i].onclick = null;
+    if(i === correctIdx) btns[i].classList.add('btn-correct');
+    if(i === selectedIdx && i !== correctIdx) btns[i].classList.add('btn-wrong');
+  }
+
+  var isCorrect = (selectedIdx === correctIdx);
+
+  if(isCorrect){
+    tribScore.correct++;
+    tribScore.streak++;
+    fb.innerHTML = '<div class="fb-correct">✅ 正确！</div>';
+  } else {
+    tribScore.wrong++;
+    tribScore.streak = 0;
+    fb.innerHTML = '<div class="fb-wrong">❌ 错误！正确答案：<br><b>' +
+      tribState.options[correctIdx] + '</b></div>';
+  }
+
+  // Show detailed explanation
+  var explanation = tribExplain(tribState.answer, tribState.trumpRank, tribState.players);
+  fb.innerHTML += '<div class="fb-explain">' + explanation + '</div>';
+
+  // Update score
+  document.getElementById('tribCorrect').textContent = tribScore.correct;
+  document.getElementById('tribWrong').textContent = tribScore.wrong;
+  document.getElementById('tribStreak').textContent = tribScore.streak;
+
+  // Show next button
+  var nextBtn = document.getElementById('tribNextBtn');
+  if(nextBtn) nextBtn.style.display = 'inline-block';
+}
+
+function tribExplain(answer, trumpRank, players){
+  var html = '<div class="trib-explain-box">';
+  html += '<b>解析 — 进贡类型: ' + answer.type + '</b><br>';
+
+  if(answer.type === '单下抗贡'){
+    var loser = players[3];
+    html += '下游 <b>'+loser.pos+'</b> 持有2张大王 → 抗贡成功<br>';
+    html += '不进贡不还贡，上游 <b>'+answer.firstPlayer+'</b> 先出牌';
+  } else if(answer.type === '双下抗贡'){
+    html += '输方合计持有≥2张大王 → 抗贡成功<br>';
+    html += '不进贡不还贡，上游 <b>'+answer.firstPlayer+'</b> 先出牌';
+  } else if(answer.type === '单下进贡'){
+    html += '<b>'+answer.tributeGiver+'</b>(下游) 向 <b>'+answer.tributeReceiver+'</b>(上游) 进贡最大牌 <b>'+tribCardStr(answer.tributeCard)+'</b><br>';
+    html += '<b>'+answer.tributeReceiver+'</b> 还贡 <b>'+(answer.returnCard?tribCardStr(answer.returnCard):'无合适牌')+'</b> 给 <b>'+answer.returnGiver+'</b><br>';
+    html += '下游 <b>'+answer.firstPlayer+'</b> 先出牌';
+  } else if(answer.type === '双下同大'){
+    html += '三游 <b>'+answer.tributeGiver3+'</b> 进贡 <b>'+tribCardStr(answer.tributeCard3)+'</b> 给上游 <b>'+answer.tributeReceiver3+'</b><br>';
+    html += '四游 <b>'+answer.tributeGiver4+'</b> 进贡 <b>'+tribCardStr(answer.tributeCard4)+'</b> 给二游 <b>'+answer.tributeReceiver4+'</b><br>';
+    html += '同大 → 二游 <b>'+answer.firstPlayer+'</b> 先出牌';
+  } else if(answer.type === '双下不同大'){
+    html += '大牌方 <b>'+answer.tributeGiverBig+'</b> 进贡 <b>'+tribCardStr(answer.tributeCardBig)+'</b> 给上游 <b>'+answer.tributeReceiverBig+'</b><br>';
+    html += '小牌方 <b>'+answer.tributeGiverSmall+'</b> 进贡 <b>'+tribCardStr(answer.tributeCardSmall)+'</b> 给二游 <b>'+answer.tributeReceiverSmall+'</b><br>';
+    html += '不同大 → 贡大者 <b>'+answer.firstPlayer+'</b> 先出牌';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+// Auto-init
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', function(){ tribNew(); });
+} else {
+  tribNew();
+}
+
+// ========== 标签页切换 ==========
+function go(mode) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.mp').forEach(p => p.classList.remove('on'));
+  event.target.classList.add('on');
+  document.getElementById(`mp-${mode}`).classList.add('on');
+  if (mode === 'pattern') patNew();
+  else if (mode === 'compare') cmpNew();
+  else if (mode === 'decision') decNew();
+  else if (mode === 'sorting') sortNew();
+  else if (mode === 'tribute') tribNew();
+  else if (mode === 'game') renderGame();
+}
+
+// ========== 初始化 ==========
+updateStats();
+startNewGame();
+</script>
+</body>
+</html>
